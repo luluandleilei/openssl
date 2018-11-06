@@ -184,8 +184,7 @@ int EVP_PKEY_check(EVP_PKEY_CTX *ctx)
 
     /* use default check function in ameth */
     if (pkey->ameth == NULL || pkey->ameth->pkey_check == NULL) {
-        EVPerr(EVP_F_EVP_PKEY_CHECK,
-               EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+        EVPerr(EVP_F_EVP_PKEY_CHECK, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
         return -2;
     }
 

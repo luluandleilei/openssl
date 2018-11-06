@@ -539,8 +539,7 @@ end_of_options:
             goto end;
 
         if (!X509_check_private_key(x509, pkey)) {
-            BIO_printf(bio_err,
-                       "CA certificate and CA private key do not match\n");
+            BIO_printf(bio_err, "CA certificate and CA private key do not match\n");
             goto end;
         }
     }

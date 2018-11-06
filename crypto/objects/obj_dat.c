@@ -255,9 +255,9 @@ const char *OBJ_nid2sn(int n)
             return NULL;
         }
         return nid_objs[n].sn;
-    } else if (added == NULL)
+    } else if (added == NULL) {
         return NULL;
-    else {
+    } else {
         ad.type = ADDED_NID;
         ad.obj = &ob;
         ob.nid = n;
@@ -282,9 +282,9 @@ const char *OBJ_nid2ln(int n)
             return NULL;
         }
         return nid_objs[n].ln;
-    } else if (added == NULL)
+    } else if (added == NULL) {
         return NULL;
-    else {
+    } else {
         ad.type = ADDED_NID;
         ad.obj = &ob;
         ob.nid = n;
@@ -579,16 +579,12 @@ int OBJ_sn2nid(const char *s)
     return nid_objs[*op].nid;
 }
 
-const void *OBJ_bsearch_(const void *key, const void *base, int num, int size,
-                         int (*cmp) (const void *, const void *))
+const void *OBJ_bsearch_(const void *key, const void *base, int num, int size, int (*cmp) (const void *, const void *))
 {
     return OBJ_bsearch_ex_(key, base, num, size, cmp, 0);
 }
 
-const void *OBJ_bsearch_ex_(const void *key, const void *base_, int num,
-                            int size,
-                            int (*cmp) (const void *, const void *),
-                            int flags)
+const void *OBJ_bsearch_ex_(const void *key, const void *base_, int num, int size, int (*cmp) (const void *, const void *), int flags)
 {
     const char *base = base_;
     int l, h, i = 0, c = 0;

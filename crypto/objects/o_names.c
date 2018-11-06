@@ -78,9 +78,7 @@ int OBJ_NAME_init(void)
     return RUN_ONCE(&init, o_names_init);
 }
 
-int OBJ_NAME_new_index(unsigned long (*hash_func) (const char *),
-                       int (*cmp_func) (const char *, const char *),
-                       void (*free_func) (const char *, int, const char *))
+int OBJ_NAME_new_index(unsigned long (*hash_func) (const char *), int (*cmp_func) (const char *, const char *), void (*free_func) (const char *, int, const char *))
 {
     int ret = 0, i, push;
     NAME_FUNCS *name_funcs;
@@ -145,8 +143,7 @@ static int obj_name_cmp(const OBJ_NAME *a, const OBJ_NAME *b)
     if (ret == 0) {
         if ((name_funcs_stack != NULL)
             && (sk_NAME_FUNCS_num(name_funcs_stack) > a->type)) {
-            ret = sk_NAME_FUNCS_value(name_funcs_stack,
-                                      a->type)->cmp_func(a->name, b->name);
+            ret = sk_NAME_FUNCS_value(name_funcs_stack, a->type)->cmp_func(a->name, b->name);
         } else
             ret = strcasecmp(a->name, b->name);
     }
@@ -157,11 +154,8 @@ static unsigned long obj_name_hash(const OBJ_NAME *a)
 {
     unsigned long ret;
 
-    if ((name_funcs_stack != NULL)
-        && (sk_NAME_FUNCS_num(name_funcs_stack) > a->type)) {
-        ret =
-            sk_NAME_FUNCS_value(name_funcs_stack,
-                                a->type)->hash_func(a->name);
+    if ((name_funcs_stack != NULL) && (sk_NAME_FUNCS_num(name_funcs_stack) > a->type)) {
+        ret = sk_NAME_FUNCS_value(name_funcs_stack, a->type)->hash_func(a->name);
     } else {
         ret = openssl_lh_strcasehash(a->name);
     }
@@ -232,15 +226,12 @@ int OBJ_NAME_add(const char *name, int type, const char *data)
     ret = lh_OBJ_NAME_insert(names_lh, onp);
     if (ret != NULL) {
         /* free things */
-        if ((name_funcs_stack != NULL)
-            && (sk_NAME_FUNCS_num(name_funcs_stack) > ret->type)) {
+        if ((name_funcs_stack != NULL) && (sk_NAME_FUNCS_num(name_funcs_stack) > ret->type)) {
             /*
              * XXX: I'm not sure I understand why the free function should
              * get three arguments... -- Richard Levitte
              */
-            sk_NAME_FUNCS_value(name_funcs_stack,
-                                ret->type)->free_func(ret->name, ret->type,
-                                                      ret->data);
+            sk_NAME_FUNCS_value(name_funcs_stack, ret->type)->free_func(ret->name, ret->type, ret->data);
         }
         OPENSSL_free(ret);
     } else {

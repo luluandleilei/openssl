@@ -578,11 +578,9 @@ struct ASN1_ADB_TABLE_st {
 /* This is the actual ASN1 item itself */
 
 struct ASN1_ITEM_st {
-    char itype;                 /* The item type, primitive, SEQUENCE, CHOICE
-                                 * or extern */
+    char itype;                 /* The item type, primitive, SEQUENCE, CHOICE or extern */
     long utype;                 /* underlying type */
-    const ASN1_TEMPLATE *templates; /* If SEQUENCE or CHOICE this contains
-                                     * the contents */
+    const ASN1_TEMPLATE *templates; /* If SEQUENCE or CHOICE this contains the contents */
     long tcount;                /* Number of templates if SEQUENCE or CHOICE */
     const void *funcs;          /* functions that handle this type */
     long size;                  /* Structure size (usually) */
@@ -799,7 +797,7 @@ typedef struct ASN1_STREAM_ARG_st {
 # define IMPLEMENT_ASN1_FUNCTIONS_name(stname, itname) IMPLEMENT_ASN1_FUNCTIONS_fname(stname, itname, itname)
 
 # define IMPLEMENT_ASN1_FUNCTIONS_ENCODE_name(stname, itname) \
-                        IMPLEMENT_ASN1_FUNCTIONS_ENCODE_fname(stname, itname, itname)
+                IMPLEMENT_ASN1_FUNCTIONS_ENCODE_fname(stname, itname, itname)
 
 # define IMPLEMENT_STATIC_ASN1_ALLOC_FUNCTIONS(stname) \
                 IMPLEMENT_ASN1_ALLOC_FUNCTIONS_pfname(static, stname, stname, stname)

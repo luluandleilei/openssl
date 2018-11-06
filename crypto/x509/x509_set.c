@@ -123,11 +123,13 @@ const ASN1_TIME *X509_get0_notAfter(const X509 *x)
     return x->cert_info.validity.notAfter;
 }
 
+//获得证书有效期的起始日期
 ASN1_TIME *X509_getm_notBefore(const X509 *x)
 {
     return x->cert_info.validity.notBefore;
 }
 
+//获得证书有效期的终止日期
 ASN1_TIME *X509_getm_notAfter(const X509 *x)
 {
     return x->cert_info.validity.notAfter;

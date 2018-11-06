@@ -823,8 +823,7 @@ static int AES_cbc_128_encrypt_loop(void *args)
     unsigned char *buf = tempargs->buf;
     int count;
     for (count = 0; COND(c[D_CBC_128_AES][testnum]); count++)
-        AES_cbc_encrypt(buf, buf,
-                        (size_t)lengths[testnum], &aes_ks1, iv, AES_ENCRYPT);
+        AES_cbc_encrypt(buf, buf, (size_t)lengths[testnum], &aes_ks1, iv, AES_ENCRYPT);
     return count;
 }
 
@@ -834,8 +833,7 @@ static int AES_cbc_192_encrypt_loop(void *args)
     unsigned char *buf = tempargs->buf;
     int count;
     for (count = 0; COND(c[D_CBC_192_AES][testnum]); count++)
-        AES_cbc_encrypt(buf, buf,
-                        (size_t)lengths[testnum], &aes_ks2, iv, AES_ENCRYPT);
+        AES_cbc_encrypt(buf, buf, (size_t)lengths[testnum], &aes_ks2, iv, AES_ENCRYPT);
     return count;
 }
 
@@ -845,8 +843,7 @@ static int AES_cbc_256_encrypt_loop(void *args)
     unsigned char *buf = tempargs->buf;
     int count;
     for (count = 0; COND(c[D_CBC_256_AES][testnum]); count++)
-        AES_cbc_encrypt(buf, buf,
-                        (size_t)lengths[testnum], &aes_ks3, iv, AES_ENCRYPT);
+        AES_cbc_encrypt(buf, buf, (size_t)lengths[testnum], &aes_ks3, iv, AES_ENCRYPT);
     return count;
 }
 
@@ -857,8 +854,7 @@ static int AES_ige_128_encrypt_loop(void *args)
     unsigned char *buf2 = tempargs->buf2;
     int count;
     for (count = 0; COND(c[D_IGE_128_AES][testnum]); count++)
-        AES_ige_encrypt(buf, buf2,
-                        (size_t)lengths[testnum], &aes_ks1, iv, AES_ENCRYPT);
+        AES_ige_encrypt(buf, buf2, (size_t)lengths[testnum], &aes_ks1, iv, AES_ENCRYPT);
     return count;
 }
 
@@ -869,8 +865,7 @@ static int AES_ige_192_encrypt_loop(void *args)
     unsigned char *buf2 = tempargs->buf2;
     int count;
     for (count = 0; COND(c[D_IGE_192_AES][testnum]); count++)
-        AES_ige_encrypt(buf, buf2,
-                        (size_t)lengths[testnum], &aes_ks2, iv, AES_ENCRYPT);
+        AES_ige_encrypt(buf, buf2, (size_t)lengths[testnum], &aes_ks2, iv, AES_ENCRYPT);
     return count;
 }
 
@@ -881,8 +876,7 @@ static int AES_ige_256_encrypt_loop(void *args)
     unsigned char *buf2 = tempargs->buf2;
     int count;
     for (count = 0; COND(c[D_IGE_256_AES][testnum]); count++)
-        AES_ige_encrypt(buf, buf2,
-                        (size_t)lengths[testnum], &aes_ks3, iv, AES_ENCRYPT);
+        AES_ige_encrypt(buf, buf2, (size_t)lengths[testnum], &aes_ks3, iv, AES_ENCRYPT);
     return count;
 }
 

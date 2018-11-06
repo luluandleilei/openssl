@@ -168,17 +168,11 @@ const char *OpenSSL_version(int type);
 
 int OPENSSL_issetugid(void);
 
-typedef void CRYPTO_EX_new (void *parent, void *ptr, CRYPTO_EX_DATA *ad,
-                           int idx, long argl, void *argp);
-typedef void CRYPTO_EX_free (void *parent, void *ptr, CRYPTO_EX_DATA *ad,
-                             int idx, long argl, void *argp);
-typedef int CRYPTO_EX_dup (CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from,
-                           void *from_d, int idx, long argl, void *argp);
-__owur int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp,
-                            CRYPTO_EX_new *new_func, CRYPTO_EX_dup *dup_func,
-                            CRYPTO_EX_free *free_func);
-/* No longer use an index. */
-int CRYPTO_free_ex_index(int class_index, int idx);
+typedef void CRYPTO_EX_new (void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl, void *argp);
+typedef void CRYPTO_EX_free (void *parent, void *ptr, CRYPTO_EX_DATA *ad, int idx, long argl, void *argp);
+typedef int CRYPTO_EX_dup (CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from, void *from_d, int idx, long argl, void *argp);
+__owur int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp, CRYPTO_EX_new *new_func, CRYPTO_EX_dup *dup_func, CRYPTO_EX_free *free_func);
+int CRYPTO_free_ex_index(int class_index, int idx);	/* No longer use an index. */
 
 /*
  * Initialise/duplicate/free CRYPTO_EX_DATA variables corresponding to a
@@ -258,15 +252,9 @@ typedef struct crypto_threadid_st {
 #  define CRYPTO_get_dynlock_destroy_callback()         (NULL)
 # endif /* OPENSSL_API_COMPAT < 0x10100000L */
 
-int CRYPTO_set_mem_functions(
-        void *(*m) (size_t, const char *, int),
-        void *(*r) (void *, size_t, const char *, int),
-        void (*f) (void *, const char *, int));
+int CRYPTO_set_mem_functions( void *(*m) (size_t, const char *, int), void *(*r) (void *, size_t, const char *, int), void (*f) (void *, const char *, int));
 int CRYPTO_set_mem_debug(int flag);
-void CRYPTO_get_mem_functions(
-        void *(**m) (size_t, const char *, int),
-        void *(**r) (void *, size_t, const char *, int),
-        void (**f) (void *, const char *, int));
+void CRYPTO_get_mem_functions( void *(**m) (size_t, const char *, int), void *(**r) (void *, size_t, const char *, int), void (**f) (void *, const char *, int));
 
 void *CRYPTO_malloc(size_t num, const char *file, int line);
 void *CRYPTO_zalloc(size_t num, const char *file, int line);
@@ -345,8 +333,7 @@ void OPENSSL_fork_child(void);
 
 struct tm *OPENSSL_gmtime(const time_t *timer, struct tm *result);
 int OPENSSL_gmtime_adj(struct tm *tm, int offset_day, long offset_sec);
-int OPENSSL_gmtime_diff(int *pday, int *psec,
-                        const struct tm *from, const struct tm *to);
+int OPENSSL_gmtime_diff(int *pday, int *psec, const struct tm *from, const struct tm *to);
 
 /*
  * CRYPTO_memcmp returns zero iff the |len| bytes at |a| and |b| are equal.
@@ -403,8 +390,7 @@ void OPENSSL_thread_stop(void);
 /* Low-level control of initialization */
 OPENSSL_INIT_SETTINGS *OPENSSL_INIT_new(void);
 # ifndef OPENSSL_NO_STDIO
-int OPENSSL_INIT_set_config_appname(OPENSSL_INIT_SETTINGS *settings,
-                                    const char *config_file);
+int OPENSSL_INIT_set_config_appname(OPENSSL_INIT_SETTINGS *settings, const char *config_file);
 # endif
 void OPENSSL_INIT_free(OPENSSL_INIT_SETTINGS *settings);
 

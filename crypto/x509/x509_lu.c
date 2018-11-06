@@ -135,8 +135,7 @@ X509_STORE *X509_LOOKUP_get_store(const X509_LOOKUP *ctx)
 }
 
 
-static int x509_object_cmp(const X509_OBJECT *const *a,
-                           const X509_OBJECT *const *b)
+static int x509_object_cmp(const X509_OBJECT *const *a, const X509_OBJECT *const *b)
 {
     int ret;
 

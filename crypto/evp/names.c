@@ -21,12 +21,10 @@ int EVP_add_cipher(const EVP_CIPHER *c)
     if (c == NULL)
         return 0;
 
-    r = OBJ_NAME_add(OBJ_nid2sn(c->nid), OBJ_NAME_TYPE_CIPHER_METH,
-                     (const char *)c);
+    r = OBJ_NAME_add(OBJ_nid2sn(c->nid), OBJ_NAME_TYPE_CIPHER_METH, (const char *)c);
     if (r == 0)
         return 0;
-    r = OBJ_NAME_add(OBJ_nid2ln(c->nid), OBJ_NAME_TYPE_CIPHER_METH,
-                     (const char *)c);
+    r = OBJ_NAME_add(OBJ_nid2ln(c->nid), OBJ_NAME_TYPE_CIPHER_METH, (const char *)c);
     return r;
 }
 
@@ -39,18 +37,15 @@ int EVP_add_digest(const EVP_MD *md)
     r = OBJ_NAME_add(name, OBJ_NAME_TYPE_MD_METH, (const char *)md);
     if (r == 0)
         return 0;
-    r = OBJ_NAME_add(OBJ_nid2ln(md->type), OBJ_NAME_TYPE_MD_METH,
-                     (const char *)md);
+    r = OBJ_NAME_add(OBJ_nid2ln(md->type), OBJ_NAME_TYPE_MD_METH, (const char *)md);
     if (r == 0)
         return 0;
 
     if (md->pkey_type && md->type != md->pkey_type) {
-        r = OBJ_NAME_add(OBJ_nid2sn(md->pkey_type),
-                         OBJ_NAME_TYPE_MD_METH | OBJ_NAME_ALIAS, name);
+        r = OBJ_NAME_add(OBJ_nid2sn(md->pkey_type), OBJ_NAME_TYPE_MD_METH | OBJ_NAME_ALIAS, name);
         if (r == 0)
             return 0;
-        r = OBJ_NAME_add(OBJ_nid2ln(md->pkey_type),
-                         OBJ_NAME_TYPE_MD_METH | OBJ_NAME_ALIAS, name);
+        r = OBJ_NAME_add(OBJ_nid2ln(md->pkey_type), OBJ_NAME_TYPE_MD_METH | OBJ_NAME_ALIAS, name);
     }
     return r;
 }
@@ -62,12 +57,10 @@ int EVP_add_mac(const EVP_MAC *m)
     if (m == NULL)
         return 0;
 
-    r = OBJ_NAME_add(OBJ_nid2sn(m->type), OBJ_NAME_TYPE_MAC_METH,
-                     (const char *)m);
+    r = OBJ_NAME_add(OBJ_nid2sn(m->type), OBJ_NAME_TYPE_MAC_METH, (const char *)m);
     if (r == 0)
         return 0;
-    r = OBJ_NAME_add(OBJ_nid2ln(m->type), OBJ_NAME_TYPE_MAC_METH,
-                     (const char *)m);
+    r = OBJ_NAME_add(OBJ_nid2ln(m->type), OBJ_NAME_TYPE_MAC_METH, (const char *)m);
     return r;
 }
 
@@ -124,8 +117,7 @@ void evp_cleanup_int(void)
 
 struct doall_cipher {
     void *arg;
-    void (*fn) (const EVP_CIPHER *ciph,
-                const char *from, const char *to, void *arg);
+    void (*fn) (const EVP_CIPHER *ciph, const char *from, const char *to, void *arg);
 };
 
 static void do_all_cipher_fn(const OBJ_NAME *nm, void *arg)
@@ -137,9 +129,7 @@ static void do_all_cipher_fn(const OBJ_NAME *nm, void *arg)
         dc->fn((const EVP_CIPHER *)nm->data, nm->name, NULL, dc->arg);
 }
 
-void EVP_CIPHER_do_all(void (*fn) (const EVP_CIPHER *ciph,
-                                   const char *from, const char *to, void *x),
-                       void *arg)
+void EVP_CIPHER_do_all(void (*fn) (const EVP_CIPHER *ciph, const char *from, const char *to, void *x), void *arg)
 {
     struct doall_cipher dc;
 

@@ -81,8 +81,7 @@ static int apps_startup(void)
 #endif
 
     /* Set non-default library initialisation settings */
-    if (!OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN
-                          | OPENSSL_INIT_LOAD_CONFIG, NULL))
+    if (!OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN | OPENSSL_INIT_LOAD_CONFIG, NULL))
         return 0;
 
     setup_ui_method();
@@ -139,11 +138,6 @@ int main(int argc, char *argv[])
 
 #if defined(OPENSSL_SYS_VMS) && defined(__DECC)
     copied_argv = argv = copy_argv(&argc, argv);
-#elif defined(_WIN32)
-    /*
-     * Replace argv[] with UTF-8 encoded strings.
-     */
-    win32_utf8argv(&argc, &argv);
 #endif
 
     p = getenv("OPENSSL_DEBUG_MEMORY");
@@ -157,8 +151,7 @@ int main(int argc, char *argv[])
     }
 
     if (!apps_startup()) {
-        BIO_printf(bio_err,
-                   "FATAL: Startup failure (dev note: apps_startup() failed)\n");
+        BIO_printf(bio_err, "FATAL: Startup failure (dev note: apps_startup() failed)\n");
         ERR_print_errors(bio_err);
         ret = 1;
         goto end;

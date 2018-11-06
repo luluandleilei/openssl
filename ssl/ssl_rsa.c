@@ -24,6 +24,7 @@ static int ssl_set_pkey(CERT *c, EVP_PKEY *pkey);
                              | SSL_EXT_TLS1_2_SERVER_HELLO \
                              | SSL_EXT_IGNORE_ON_RESUMPTION)
 
+//Loads the certificate x into ssl
 int SSL_use_certificate(SSL *ssl, X509 *x)
 {
     int rv;
@@ -40,6 +41,7 @@ int SSL_use_certificate(SSL *ssl, X509 *x)
     return ssl_set_cert(ssl->cert, x);
 }
 
+//Loads the first certificate stored in file into ssl. The formatting type of the certificate must be specified from the known types SSL_FILETYPE_PEM, SSL_FILETYPE_ASN1. 
 int SSL_use_certificate_file(SSL *ssl, const char *file, int type)
 {
     int j;
@@ -62,8 +64,7 @@ int SSL_use_certificate_file(SSL *ssl, const char *file, int type)
         x = d2i_X509_bio(in, NULL);
     } else if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        x = PEM_read_bio_X509(in, NULL, ssl->default_passwd_callback,
-                              ssl->default_passwd_callback_userdata);
+        x = PEM_read_bio_X509(in, NULL, ssl->default_passwd_callback, ssl->default_passwd_callback_userdata);
     } else {
         SSLerr(SSL_F_SSL_USE_CERTIFICATE_FILE, SSL_R_BAD_SSL_FILETYPE);
         goto end;
@@ -81,6 +82,7 @@ int SSL_use_certificate_file(SSL *ssl, const char *file, int type)
     return ret;
 }
 
+//Loads the ASN1 encoded certificate from the memory location d (with length len) into ssl
 int SSL_use_certificate_ASN1(SSL *ssl, const unsigned char *d, int len)
 {
     X509 *x;
@@ -98,6 +100,7 @@ int SSL_use_certificate_ASN1(SSL *ssl, const unsigned char *d, int len)
 }
 
 #ifndef OPENSSL_NO_RSA
+//Adds the private key rsa of type RSA to ssl
 int SSL_use_RSAPrivateKey(SSL *ssl, RSA *rsa)
 {
     EVP_PKEY *pkey;
@@ -193,9 +196,7 @@ int SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type)
         rsa = d2i_RSAPrivateKey_bio(in, NULL);
     } else if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        rsa = PEM_read_bio_RSAPrivateKey(in, NULL,
-                                         ssl->default_passwd_callback,
-                                         ssl->default_passwd_callback_userdata);
+        rsa = PEM_read_bio_RSAPrivateKey(in, NULL, ssl->default_passwd_callback, ssl->default_passwd_callback_userdata);
     } else {
         SSLerr(SSL_F_SSL_USE_RSAPRIVATEKEY_FILE, SSL_R_BAD_SSL_FILETYPE);
         goto end;
@@ -229,6 +230,7 @@ int SSL_use_RSAPrivateKey_ASN1(SSL *ssl, const unsigned char *d, long len)
 }
 #endif                          /* !OPENSSL_NO_RSA */
 
+//Adds pkey as private key to ssl
 int SSL_use_PrivateKey(SSL *ssl, EVP_PKEY *pkey)
 {
     int ret;
@@ -259,9 +261,7 @@ int SSL_use_PrivateKey_file(SSL *ssl, const char *file, int type)
     }
     if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        pkey = PEM_read_bio_PrivateKey(in, NULL,
-                                       ssl->default_passwd_callback,
-                                       ssl->default_passwd_callback_userdata);
+        pkey = PEM_read_bio_PrivateKey(in, NULL, ssl->default_passwd_callback, ssl->default_passwd_callback_userdata);
     } else if (type == SSL_FILETYPE_ASN1) {
         j = ERR_R_ASN1_LIB;
         pkey = d2i_PrivateKey_bio(in, NULL);
@@ -298,6 +298,7 @@ int SSL_use_PrivateKey_ASN1(int type, SSL *ssl, const unsigned char *d,
     return ret;
 }
 
+//Loads the certificate x into ctx,
 int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
 {
     int rv;
@@ -348,8 +349,8 @@ static int ssl_set_cert(CERT *c, X509 *x)
          * cards.
          */
         if (EVP_PKEY_id(c->pkeys[i].privatekey) == EVP_PKEY_RSA
-            && RSA_flags(EVP_PKEY_get0_RSA(c->pkeys[i].privatekey)) &
-            RSA_METHOD_FLAG_NO_CHECK) ;
+            && RSA_flags(EVP_PKEY_get0_RSA(c->pkeys[i].privatekey)) & RSA_METHOD_FLAG_NO_CHECK)
+            	/*nothing*/;
         else
 #endif                          /* OPENSSL_NO_RSA */
         if (!X509_check_private_key(x, c->pkeys[i].privatekey)) {
@@ -373,6 +374,7 @@ static int ssl_set_cert(CERT *c, X509 *x)
     return 1;
 }
 
+//loads the first certificate stored in file into ctx. The formatting type of the certificate must be specified from the known types SSL_FILETYPE_PEM, SSL_FILETYPE_ASN1.
 int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
 {
     int j;
@@ -395,8 +397,7 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
         x = d2i_X509_bio(in, NULL);
     } else if (type == SSL_FILETYPE_PEM) {
         j = ERR_R_PEM_LIB;
-        x = PEM_read_bio_X509(in, NULL, ctx->default_passwd_callback,
-                              ctx->default_passwd_callback_userdata);
+        x = PEM_read_bio_X509(in, NULL, ctx->default_passwd_callback, ctx->default_passwd_callback_userdata);
     } else {
         SSLerr(SSL_F_SSL_CTX_USE_CERTIFICATE_FILE, SSL_R_BAD_SSL_FILETYPE);
         goto end;
@@ -414,6 +415,7 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
     return ret;
 }
 
+//Loads the ASN1 encoded certificate from the memory location d (with length len) into ctx
 int SSL_CTX_use_certificate_ASN1(SSL_CTX *ctx, int len, const unsigned char *d)
 {
     X509 *x;
@@ -431,6 +433,7 @@ int SSL_CTX_use_certificate_ASN1(SSL_CTX *ctx, int len, const unsigned char *d)
 }
 
 #ifndef OPENSSL_NO_RSA
+//Adds the private key rsa of type RSA to ctx
 int SSL_CTX_use_RSAPrivateKey(SSL_CTX *ctx, RSA *rsa)
 {
     int ret;
@@ -594,8 +597,7 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
     pem_password_cb *passwd_callback;
     void *passwd_callback_userdata;
 
-    ERR_clear_error();          /* clear error stack for
-                                 * SSL_CTX_use_certificate() */
+    ERR_clear_error();          /* clear error stack for SSL_CTX_use_certificate() */
 
     if (ctx != NULL) {
         passwd_callback = ctx->default_passwd_callback;
@@ -616,8 +618,7 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
         goto end;
     }
 
-    x = PEM_read_bio_X509_AUX(in, NULL, passwd_callback,
-                              passwd_callback_userdata);
+    x = PEM_read_bio_X509_AUX(in, NULL, passwd_callback, passwd_callback_userdata);
     if (x == NULL) {
         SSLerr(SSL_F_USE_CERTIFICATE_CHAIN_FILE, ERR_R_PEM_LIB);
         goto end;
@@ -629,12 +630,10 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
         ret = SSL_use_certificate(ssl, x);
 
     if (ERR_peek_error() != 0)
-        ret = 0;                /* Key/certificate mismatch doesn't imply
-                                 * ret==0 ... */
+        ret = 0;                /* Key/certificate mismatch doesn't imply ret==0 ... */
     if (ret) {
         /*
-         * If we could set up our certificate, now proceed to the CA
-         * certificates.
+         * If we could set up our certificate, now proceed to the CA certificates.
          */
         X509 *ca;
         int r;
@@ -650,8 +649,7 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
             goto end;
         }
 
-        while ((ca = PEM_read_bio_X509(in, NULL, passwd_callback,
-                                       passwd_callback_userdata))
+        while ((ca = PEM_read_bio_X509(in, NULL, passwd_callback, passwd_callback_userdata))
                != NULL) {
             if (ctx)
                 r = SSL_CTX_add0_chain_cert(ctx, ca);
@@ -683,11 +681,13 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
     return ret;
 }
 
+//Loads a certificate chain from file into ctx. The certificates must be in PEM format and must be sorted starting with the subject's certificate (actual client or server certificate), followed by intermediate CA certificates if applicable, and ending at the highest level (root) CA. 
 int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
 {
     return use_certificate_chain_file(ctx, NULL, file);
 }
 
+//Loads a certificate chain from file into ssl. The certificates must be in PEM format and must be sorted starting with the subject's certificate (actual client or server certificate), followed by intermediate CA certificates if applicable, and ending at the highest level (root) CA
 int SSL_use_certificate_chain_file(SSL *ssl, const char *file)
 {
     return use_certificate_chain_file(NULL, ssl, file);

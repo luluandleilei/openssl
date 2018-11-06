@@ -192,8 +192,7 @@ void engine_table_cleanup(ENGINE_TABLE **table)
 #ifndef ENGINE_TABLE_DEBUG
 ENGINE *engine_table_select(ENGINE_TABLE **table, int nid)
 #else
-ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
-                                int l)
+ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f, int l)
 #endif
 {
     ENGINE *ret = NULL;
@@ -202,8 +201,7 @@ ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
 
     if (!(*table)) {
 #ifdef ENGINE_TABLE_DEBUG
-        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, nothing "
-                "registered!\n", f, l, nid);
+        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, nothing registered!\n", f, l, nid);
 #endif
         return NULL;
     }
@@ -235,8 +233,7 @@ ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
     ret = sk_ENGINE_value(fnd->sk, loop++);
     if (!ret) {
 #ifdef ENGINE_TABLE_DEBUG
-        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, no "
-                "registered implementations would initialise\n", f, l, nid);
+        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, no registered implementations would initialise\n", f, l, nid);
 #endif
         goto end;
     }
@@ -253,13 +250,11 @@ ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
                 engine_unlocked_finish(fnd->funct, 0);
             fnd->funct = ret;
 #ifdef ENGINE_TABLE_DEBUG
-            fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, "
-                    "setting default to '%s'\n", f, l, nid, ret->id);
+            fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, setting default to '%s'\n", f, l, nid, ret->id);
 #endif
         }
 #ifdef ENGINE_TABLE_DEBUG
-        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, using "
-                "newly initialised '%s'\n", f, l, nid, ret->id);
+        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, using newly initialised '%s'\n", f, l, nid, ret->id);
 #endif
         goto end;
     }
@@ -273,11 +268,9 @@ ENGINE *engine_table_select_tmp(ENGINE_TABLE **table, int nid, const char *f,
         fnd->uptodate = 1;
 #ifdef ENGINE_TABLE_DEBUG
     if (ret)
-        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, caching "
-                "ENGINE '%s'\n", f, l, nid, ret->id);
+        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, caching ENGINE '%s'\n", f, l, nid, ret->id);
     else
-        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, caching "
-                "'no matching ENGINE'\n", f, l, nid);
+        fprintf(stderr, "engine_table_dbg: %s:%d, nid=%d, caching 'no matching ENGINE'\n", f, l, nid);
 #endif
     CRYPTO_THREAD_unlock(global_engine_lock);
     /*

@@ -594,8 +594,7 @@ padlock_ciphers(ENGINE *e, const EVP_CIPHER **cipher, const int **nids,
 
 /* Prepare the encryption key for PadLock usage */
 static int
-padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                     const unsigned char *iv, int enc)
+padlock_aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     struct padlock_cipher_data *cdata;
     int key_len = EVP_CIPHER_CTX_key_length(ctx) * 8;

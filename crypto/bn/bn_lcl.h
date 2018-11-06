@@ -53,8 +53,7 @@
  * this should be on.  Again this in only really a problem on machines using
  * "long long's", are 32bit, and are not using my assembler code.
  */
-# if defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_WINDOWS) || \
-    defined(OPENSSL_SYS_WIN32) || defined(linux)
+# if defined(OPENSSL_SYS_MSDOS) || defined(OPENSSL_SYS_WINDOWS) ||  defined(OPENSSL_SYS_WIN32) || defined(linux)
 #  define BN_DIV2W
 # endif
 
@@ -205,19 +204,15 @@
 
 # endif
 
-BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num,
-                          BN_ULONG w);
+BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num, BN_ULONG w);
 BN_ULONG bn_mul_words(BN_ULONG *rp, const BN_ULONG *ap, int num, BN_ULONG w);
 void bn_sqr_words(BN_ULONG *rp, const BN_ULONG *ap, int num);
 BN_ULONG bn_div_words(BN_ULONG h, BN_ULONG l, BN_ULONG d);
-BN_ULONG bn_add_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
-                      int num);
-BN_ULONG bn_sub_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
-                      int num);
+BN_ULONG bn_add_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp, int num);
+BN_ULONG bn_sub_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp, int num);
 
 struct bignum_st {
-    BN_ULONG *d;                /* Pointer to an array of 'BN_BITS2' bit
-                                 * chunks. */
+    BN_ULONG *d;                /* Pointer to an array of 'BN_BITS2' bit chunks. */
     int top;                    /* Index of last used d +1. */
     /* The next are internal book keeping for bn_expand. */
     int dmax;                   /* Size of the d array. */
@@ -228,14 +223,10 @@ struct bignum_st {
 /* Used for montgomery multiplication */
 struct bn_mont_ctx_st {
     int ri;                     /* number of bits in R */
-    BIGNUM RR;                  /* used to convert to montgomery form,
-                                   possibly zero-padded */
+    BIGNUM RR;                  /* used to convert to montgomery form, possibly zero-padded */
     BIGNUM N;                   /* The modulus */
-    BIGNUM Ni;                  /* R*(1/R mod N) - N*Ni = 1 (Ni is only
-                                 * stored for bignum algorithm) */
-    BN_ULONG n0[2];             /* least significant word(s) of Ni; (type
-                                 * changed with 0.9.9, was "BN_ULONG n0;"
-                                 * before) */
+    BIGNUM Ni;                  /* R*(1/R mod N) - N*Ni = 1 (Ni is only stored for bignum algorithm) */
+    BN_ULONG n0[2];             /* least significant word(s) of Ni; (type changed with 0.9.9, was "BN_ULONG n0;" before) */
     int flags;
 };
 

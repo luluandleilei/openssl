@@ -78,8 +78,7 @@ static int pmeth_cmp(const EVP_PKEY_METHOD *const *a,
     return ((*a)->pkey_id - (*b)->pkey_id);
 }
 
-IMPLEMENT_OBJ_BSEARCH_CMP_FN(const EVP_PKEY_METHOD *, const EVP_PKEY_METHOD *,
-                             pmeth);
+IMPLEMENT_OBJ_BSEARCH_CMP_FN(const EVP_PKEY_METHOD *, const EVP_PKEY_METHOD *, pmeth);
 
 const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type)
 {
@@ -92,9 +91,7 @@ const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type)
         if (idx >= 0)
             return sk_EVP_PKEY_METHOD_value(app_pkey_methods, idx);
     }
-    ret = OBJ_bsearch_pmeth(&t, standard_methods,
-                            sizeof(standard_methods) /
-                            sizeof(EVP_PKEY_METHOD *));
+    ret = OBJ_bsearch_pmeth(&t, standard_methods, sizeof(standard_methods) / sizeof(EVP_PKEY_METHOD *));
     if (!ret || !*ret)
         return NULL;
     return *ret;
@@ -124,8 +121,7 @@ static EVP_PKEY_CTX *int_ctx_new(EVP_PKEY *pkey, ENGINE *e, int id)
     }
 
     /*
-     * If an ENGINE handled this method look it up. Otherwise use internal
-     * tables.
+     * If an ENGINE handled this method look it up. Otherwise use internal tables.
      */
     if (e)
         pmeth = ENGINE_get_pkey_meth(e, id);

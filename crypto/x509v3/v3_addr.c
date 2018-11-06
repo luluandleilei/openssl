@@ -1287,9 +1287,7 @@ static int addr_validate_path_internal(X509_STORE_CTX *ctx,
  */
 int X509v3_addr_validate_path(X509_STORE_CTX *ctx)
 {
-    if (ctx->chain == NULL
-            || sk_X509_num(ctx->chain) == 0
-            || ctx->verify_cb == NULL) {
+    if (ctx->chain == NULL || sk_X509_num(ctx->chain) == 0 || ctx->verify_cb == NULL) {
         ctx->error = X509_V_ERR_UNSPECIFIED;
         return 0;
     }

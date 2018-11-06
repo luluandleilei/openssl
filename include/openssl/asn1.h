@@ -252,8 +252,7 @@ typedef struct ASN1_VALUE_st ASN1_VALUE;
         DECLARE_ASN1_PRINT_FUNCTION_fname(stname, stname)
 
 # define DECLARE_ASN1_PRINT_FUNCTION_fname(stname, fname) \
-        int fname##_print_ctx(BIO *out, stname *x, int indent, \
-                                         const ASN1_PCTX *pctx);
+        int fname##_print_ctx(BIO *out, stname *x, int indent, const ASN1_PCTX *pctx);
 
 # define D2I_OF(type) type *(*)(type **,const unsigned char **,long)
 # define I2D_OF(type) int (*)(type *,unsigned char **)
@@ -325,8 +324,7 @@ typedef const ASN1_ITEM ASN1_ITEM_EXP;
 
 #  define ASN1_ITEM_rptr(ref) (&(ref##_it))
 
-#  define DECLARE_ASN1_ITEM(name) \
-        OPENSSL_EXTERN const ASN1_ITEM name##_it;
+#  define DECLARE_ASN1_ITEM(name)  OPENSSL_EXTERN const ASN1_ITEM name##_it;
 
 # else
 
@@ -346,8 +344,7 @@ typedef const ASN1_ITEM *ASN1_ITEM_EXP (void);
 
 #  define ASN1_ITEM_rptr(ref) (ref##_it())
 
-#  define DECLARE_ASN1_ITEM(name) \
-        const ASN1_ITEM * name##_it(void);
+#  define DECLARE_ASN1_ITEM(name)  const ASN1_ITEM * name##_it(void);
 
 # endif
 

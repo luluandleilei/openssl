@@ -15,9 +15,7 @@
 # define STRICT_ALIGNMENT 0
 #endif
 
-void CRYPTO_cbc128_encrypt(const unsigned char *in, unsigned char *out,
-                           size_t len, const void *key,
-                           unsigned char ivec[16], block128_f block)
+void CRYPTO_cbc128_encrypt(const unsigned char *in, unsigned char *out, size_t len, const void *key, unsigned char ivec[16], block128_f block)
 {
     size_t n;
     const unsigned char *iv = ivec;
@@ -26,8 +24,9 @@ void CRYPTO_cbc128_encrypt(const unsigned char *in, unsigned char *out,
         return;
 
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
-    if (STRICT_ALIGNMENT &&
-        ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
+	//STRICT_ALIGNMENT -- 表示是否CPU体系结构强制要求内存对齐
+	//((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) -- 表示in, out, ivec中有一个不是按sizeof(size_t)字节内存对齐的
+    if (STRICT_ALIGNMENT && ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
         while (len >= 16) {
             for (n = 0; n < 16; ++n)
                 out[n] = in[n] ^ iv[n];
@@ -40,8 +39,7 @@ void CRYPTO_cbc128_encrypt(const unsigned char *in, unsigned char *out,
     } else {
         while (len >= 16) {
             for (n = 0; n < 16; n += sizeof(size_t))
-                *(size_t *)(out + n) =
-                    *(size_t *)(in + n) ^ *(size_t *)(iv + n);
+                *(size_t *)(out + n) = *(size_t *)(in + n) ^ *(size_t *)(iv + n);
             (*block) (out, out, key);
             iv = out;
             len -= 16;
@@ -66,9 +64,7 @@ void CRYPTO_cbc128_encrypt(const unsigned char *in, unsigned char *out,
     memcpy(ivec, iv, 16);
 }
 
-void CRYPTO_cbc128_decrypt(const unsigned char *in, unsigned char *out,
-                           size_t len, const void *key,
-                           unsigned char ivec[16], block128_f block)
+void CRYPTO_cbc128_decrypt(const unsigned char *in, unsigned char *out, size_t len, const void *key, unsigned char ivec[16], block128_f block)
 {
     size_t n;
     union {
@@ -80,11 +76,10 @@ void CRYPTO_cbc128_decrypt(const unsigned char *in, unsigned char *out,
         return;
 
 #if !defined(OPENSSL_SMALL_FOOTPRINT)
-    if (in != out) {
+    if (in != out) {	//解密后的明文不放在密文的内存中
         const unsigned char *iv = ivec;
 
-        if (STRICT_ALIGNMENT &&
-            ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
+        if (STRICT_ALIGNMENT && ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
             while (len >= 16) {
                 (*block) (in, out, key);
                 for (n = 0; n < 16; ++n)
@@ -108,9 +103,8 @@ void CRYPTO_cbc128_decrypt(const unsigned char *in, unsigned char *out,
             }
         }
         memcpy(ivec, iv, 16);
-    } else {
-        if (STRICT_ALIGNMENT &&
-            ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
+    } else {	//解密后的明文放在密文的内存中
+        if (STRICT_ALIGNMENT && ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
             unsigned char c;
             while (len >= 16) {
                 (*block) (in, tmp.c, key);

@@ -845,8 +845,7 @@ static int ecdh_cms_encrypt(CMS_RecipientInfo *ri)
         pubkey->flags |= ASN1_STRING_FLAG_BITS_LEFT;
 
         penc = NULL;
-        X509_ALGOR_set0(talg, OBJ_nid2obj(NID_X9_62_id_ecPublicKey),
-                        V_ASN1_UNDEF, NULL);
+        X509_ALGOR_set0(talg, OBJ_nid2obj(NID_X9_62_id_ecPublicKey), V_ASN1_UNDEF, NULL);
     }
 
     /* See if custom parameters set */

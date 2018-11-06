@@ -97,8 +97,7 @@ void bn_sqr_words(BN_ULONG *r, const BN_ULONG *a, int n)
     }
 }
 
-#else                           /* !(defined(BN_LLONG) ||
-                                 * defined(BN_UMULT_HIGH)) */
+#else                           /* !(defined(BN_LLONG) || * defined(BN_UMULT_HIGH)) */
 
 BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num,
                           BN_ULONG w)
@@ -190,8 +189,7 @@ void bn_sqr_words(BN_ULONG *r, const BN_ULONG *a, int n)
     }
 }
 
-#endif                          /* !(defined(BN_LLONG) ||
-                                 * defined(BN_UMULT_HIGH)) */
+#endif                          /* !(defined(BN_LLONG) || * defined(BN_UMULT_HIGH)) */
 
 #if defined(BN_LLONG) && defined(BN_DIV2W)
 
@@ -269,8 +267,7 @@ BN_ULONG bn_div_words(BN_ULONG h, BN_ULONG l, BN_ULONG d)
 #endif                          /* !defined(BN_LLONG) && defined(BN_DIV2W) */
 
 #ifdef BN_LLONG
-BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
-                      int n)
+BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b, int n)
 {
     BN_ULLONG ll = 0;
 
@@ -310,8 +307,7 @@ BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
     return (BN_ULONG)ll;
 }
 #else                           /* !BN_LLONG */
-BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
-                      int n)
+BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b, int n)
 {
     BN_ULONG c, l, t;
 
@@ -368,8 +364,7 @@ BN_ULONG bn_add_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
 }
 #endif                          /* !BN_LLONG */
 
-BN_ULONG bn_sub_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
-                      int n)
+BN_ULONG bn_sub_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b, int n)
 {
     BN_ULONG t1, t2;
     int c = 0;

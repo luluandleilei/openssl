@@ -236,9 +236,7 @@ static int pkey_rsa_verifyrecover(EVP_PKEY_CTX *ctx,
     return 1;
 }
 
-static int pkey_rsa_verify(EVP_PKEY_CTX *ctx,
-                           const unsigned char *sig, size_t siglen,
-                           const unsigned char *tbs, size_t tbslen)
+static int pkey_rsa_verify(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t siglen, const unsigned char *tbs, size_t tbslen)
 {
     RSA_PKEY_CTX *rctx = ctx->data;
     RSA *rsa = ctx->pkey->pkey.rsa;
@@ -246,8 +244,7 @@ static int pkey_rsa_verify(EVP_PKEY_CTX *ctx,
 
     if (rctx->md) {
         if (rctx->pad_mode == RSA_PKCS1_PADDING)
-            return RSA_verify(EVP_MD_type(rctx->md), tbs, tbslen,
-                              sig, siglen, rsa);
+            return RSA_verify(EVP_MD_type(rctx->md), tbs, tbslen, sig, siglen, rsa);
         if (tbslen != (size_t)EVP_MD_size(rctx->md)) {
             RSAerr(RSA_F_PKEY_RSA_VERIFY, RSA_R_INVALID_DIGEST_LENGTH);
             return -1;

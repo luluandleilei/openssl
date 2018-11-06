@@ -246,8 +246,7 @@ static size_t asn1_put_uint64(unsigned char b[sizeof(uint64_t)], uint64_t r)
 #define ABS_INT64_MIN ((uint64_t)INT64_MAX + (-(INT64_MIN + INT64_MAX)))
 
 /* signed version of asn1_get_uint64 */
-static int asn1_get_int64(int64_t *pr, const unsigned char *b, size_t blen,
-                          int neg)
+static int asn1_get_int64(int64_t *pr, const unsigned char *b, size_t blen, int neg)
 {
     uint64_t r;
     if (asn1_get_uint64(&r, b, blen) == 0)
@@ -350,8 +349,7 @@ static int asn1_string_set_int64(ASN1_STRING *a, int64_t r, int itype)
     return ASN1_STRING_set(a, tbuf + off, sizeof(tbuf) - off);
 }
 
-static int asn1_string_get_uint64(uint64_t *pr, const ASN1_STRING *a,
-                                  int itype)
+static int asn1_string_get_uint64(uint64_t *pr, const ASN1_STRING *a, int itype)
 {
     if (a == NULL) {
         ASN1err(ASN1_F_ASN1_STRING_GET_UINT64, ERR_R_PASSED_NULL_PARAMETER);

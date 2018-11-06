@@ -46,7 +46,8 @@ certificate chain.
 
 typedef enum {
     X509_LU_NONE = 0,
-    X509_LU_X509, X509_LU_CRL
+    X509_LU_X509, 
+    X509_LU_CRL
 } X509_LOOKUP_TYPE;
 
 #if OPENSSL_API_COMPAT < 0x10100000L

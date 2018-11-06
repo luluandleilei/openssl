@@ -79,6 +79,7 @@ int X509_CRL_match(const X509_CRL *a, const X509_CRL *b)
     return memcmp(a->sha1_hash, b->sha1_hash, 20);
 }
 
+//获得证书颁发者信息
 X509_NAME *X509_get_issuer_name(const X509 *a)
 {
     return a->cert_info.issuer;
@@ -96,6 +97,7 @@ unsigned long X509_issuer_name_hash_old(X509 *x)
 }
 #endif
 
+//获得证书拥有者信息
 X509_NAME *X509_get_subject_name(const X509 *a)
 {
     return a->cert_info.subject;
@@ -268,6 +270,7 @@ EVP_PKEY *X509_get0_pubkey(const X509 *x)
     return X509_PUBKEY_get0(x->cert_info.key);
 }
 
+//获得证书公钥
 EVP_PKEY *X509_get_pubkey(X509 *x)
 {
     if (x == NULL)
@@ -275,6 +278,7 @@ EVP_PKEY *X509_get_pubkey(X509 *x)
     return X509_PUBKEY_get(x->cert_info.key);
 }
 
+//Checks the consistency of private key k with the public key in certificate x
 int X509_check_private_key(const X509 *x, const EVP_PKEY *k)
 {
     const EVP_PKEY *xk;

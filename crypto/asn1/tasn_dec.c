@@ -102,9 +102,7 @@ unsigned long ASN1_tag2bit(int tag)
  * this will simply be a special case.
  */
 
-ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **pval,
-                          const unsigned char **in, long len,
-                          const ASN1_ITEM *it)
+ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **pval, const unsigned char **in, long len, const ASN1_ITEM *it)
 {
     ASN1_TLC c;
     ASN1_VALUE *ptmpval = NULL;
@@ -184,8 +182,7 @@ static int asn1_item_embed_d2i(ASN1_VALUE **pval, const unsigned char **in,
     case ASN1_ITYPE_MSTRING:
         p = *in;
         /* Just read in tag and class */
-        ret = asn1_check_tlen(NULL, &otag, &oclass, NULL, NULL,
-                              &p, len, -1, 0, 1, ctx);
+        ret = asn1_check_tlen(NULL, &otag, &oclass, NULL, NULL, &p, len, -1, 0, 1, ctx);
         if (!ret) {
             ASN1err(ASN1_F_ASN1_ITEM_EMBED_D2I, ERR_R_NESTED_ASN1_ERROR);
             goto err;

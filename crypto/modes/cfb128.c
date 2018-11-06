@@ -16,10 +16,7 @@
  * The extra state information to record how much of the 128bit block we have
  * used is contained in *num;
  */
-void CRYPTO_cfb128_encrypt(const unsigned char *in, unsigned char *out,
-                           size_t len, const void *key,
-                           unsigned char ivec[16], int *num,
-                           int enc, block128_f block)
+void CRYPTO_cfb128_encrypt(const unsigned char *in, unsigned char *out, size_t len, const void *key, unsigned char ivec[16], int *num, int enc, block128_f block)
 {
     unsigned int n;
     size_t l = 0;
@@ -36,15 +33,13 @@ void CRYPTO_cfb128_encrypt(const unsigned char *in, unsigned char *out,
                     n = (n + 1) % 16;
                 }
 # if defined(STRICT_ALIGNMENT)
-                if (((size_t)in | (size_t)out | (size_t)ivec) %
-                    sizeof(size_t) != 0)
+                if (((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0)
                     break;
 # endif
                 while (len >= 16) {
                     (*block) (ivec, ivec, key);
                     for (; n < 16; n += sizeof(size_t)) {
-                        *(size_t *)(out + n) =
-                            *(size_t *)(ivec + n) ^= *(size_t *)(in + n);
+                        *(size_t *)(out + n) = *(size_t *)(ivec + n) ^= *(size_t *)(in + n);
                     }
                     len -= 16;
                     out += 16;
@@ -134,10 +129,7 @@ void CRYPTO_cfb128_encrypt(const unsigned char *in, unsigned char *out,
  * This expects a single block of size nbits for both in and out. Note that
  * it corrupts any extra bits in the last byte of out
  */
-static void cfbr_encrypt_block(const unsigned char *in, unsigned char *out,
-                               int nbits, const void *key,
-                               unsigned char ivec[16], int enc,
-                               block128_f block)
+static void cfbr_encrypt_block(const unsigned char *in, unsigned char *out, int nbits, const void *key, unsigned char ivec[16], int enc, block128_f block)
 {
     int n, rem, num;
     unsigned char ovec[16 * 2 + 1]; /* +1 because we dereference (but don't
@@ -170,10 +162,7 @@ static void cfbr_encrypt_block(const unsigned char *in, unsigned char *out,
 }
 
 /* N.B. This expects the input to be packed, MS bit first */
-void CRYPTO_cfb128_1_encrypt(const unsigned char *in, unsigned char *out,
-                             size_t bits, const void *key,
-                             unsigned char ivec[16], int *num,
-                             int enc, block128_f block)
+void CRYPTO_cfb128_1_encrypt(const unsigned char *in, unsigned char *out, size_t bits, const void *key, unsigned char ivec[16], int *num, int enc, block128_f block)
 {
     size_t n;
     unsigned char c[1], d[1];
@@ -186,10 +175,7 @@ void CRYPTO_cfb128_1_encrypt(const unsigned char *in, unsigned char *out,
     }
 }
 
-void CRYPTO_cfb128_8_encrypt(const unsigned char *in, unsigned char *out,
-                             size_t length, const void *key,
-                             unsigned char ivec[16], int *num,
-                             int enc, block128_f block)
+void CRYPTO_cfb128_8_encrypt(const unsigned char *in, unsigned char *out, size_t length, const void *key, unsigned char ivec[16], int *num, int enc, block128_f block)
 {
     size_t n;
 

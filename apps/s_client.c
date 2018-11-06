@@ -1010,15 +1010,11 @@ int s_client_main(int argc, char **argv)
     while ((o = opt_next()) != OPT_EOF) {
         /* Check for intermixing flags. */
         if (connect_type == use_unix && IS_INET_FLAG(o)) {
-            BIO_printf(bio_err,
-                       "%s: Intermixed protocol flags (unix and internet domains)\n",
-                       prog);
+            BIO_printf(bio_err, "%s: Intermixed protocol flags (unix and internet domains)\n", prog);
             goto end;
         }
         if (connect_type == use_inet && IS_UNIX_FLAG(o)) {
-            BIO_printf(bio_err,
-                       "%s: Intermixed protocol flags (internet and unix domains)\n",
-                       prog);
+            BIO_printf(bio_err, "%s: Intermixed protocol flags (internet and unix domains)\n", prog);
             goto end;
         }
 
@@ -1029,8 +1025,7 @@ int s_client_main(int argc, char **argv)
         if (IS_NO_PROT_FLAG(o))
             no_prot_opt++;
         if (prot_opt == 1 && no_prot_opt) {
-            BIO_printf(bio_err,
-                       "Cannot supply both a protocol flag and '-no_<prot>'\n");
+            BIO_printf(bio_err, "Cannot supply both a protocol flag and '-no_<prot>'\n");
             goto end;
         }
 
@@ -1468,9 +1463,7 @@ int s_client_main(int argc, char **argv)
                 maxfraglen = TLSEXT_max_fragment_length_4096;
                 break;
             default:
-                BIO_printf(bio_err,
-                           "%s: Max Fragment Len %u is out of permitted values",
-                           prog, len);
+                BIO_printf(bio_err, "%s: Max Fragment Len %u is out of permitted values", prog, len);
                 goto opthelp;
             }
             break;
@@ -1567,9 +1560,7 @@ int s_client_main(int argc, char **argv)
         if (tmp_port != port)
             OPENSSL_free(tmp_port);
         if (!res) {
-            BIO_printf(bio_err,
-                       "%s: -connect argument or target parameter malformed or ambiguous\n",
-                       prog);
+            BIO_printf(bio_err, "%s: -connect argument or target parameter malformed or ambiguous\n", prog);
             goto end;
         }
     }
@@ -1579,17 +1570,14 @@ int s_client_main(int argc, char **argv)
         res = BIO_parse_hostserv(bindstr, &bindhost, &bindport,
                                  BIO_PARSE_PRIO_HOST);
         if (!res) {
-            BIO_printf(bio_err,
-                       "%s: -bind argument parameter malformed or ambiguous\n",
-                       prog);
+            BIO_printf(bio_err, "%s: -bind argument parameter malformed or ambiguous\n", prog);
             goto end;
         }
     }
 
 #ifdef AF_UNIX
     if (socket_family == AF_UNIX && socket_type != SOCK_STREAM) {
-        BIO_printf(bio_err,
-                   "Can't use unix sockets and datagrams together\n");
+        BIO_printf(bio_err, "Can't use unix sockets and datagrams together\n");
         goto end;
     }
 #endif
@@ -1627,8 +1615,7 @@ int s_client_main(int argc, char **argv)
         key_file = cert_file;
 
     if (key_file != NULL) {
-        key = load_key(key_file, key_format, 0, pass, e,
-                       "client certificate private key file");
+        key = load_key(key_file, key_format, 0, pass, e, "client certificate private key file");
         if (key == NULL) {
             ERR_print_errors(bio_err);
             goto end;
@@ -1644,8 +1631,7 @@ int s_client_main(int argc, char **argv)
     }
 
     if (chain_file != NULL) {
-        if (!load_certs(chain_file, &chain, FORMAT_PEM, NULL,
-                        "client certificate chain"))
+        if (!load_certs(chain_file, &chain, FORMAT_PEM, NULL, "client certificate chain"))
             goto end;
     }
 

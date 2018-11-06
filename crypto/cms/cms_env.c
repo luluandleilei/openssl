@@ -546,8 +546,7 @@ CMS_RecipientInfo *CMS_add0_recipient_key(CMS_ContentInfo *cms, int nid,
         kekri->kekid->other->keyAttr = otherType;
     }
 
-    X509_ALGOR_set0(kekri->keyEncryptionAlgorithm,
-                    OBJ_nid2obj(nid), V_ASN1_UNDEF, NULL);
+    X509_ALGOR_set0(kekri->keyEncryptionAlgorithm, OBJ_nid2obj(nid), V_ASN1_UNDEF, NULL);
 
     return ri;
 

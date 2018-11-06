@@ -20,7 +20,7 @@
 struct X509_pubkey_st {
     X509_ALGOR *algor;
     ASN1_BIT_STRING *public_key;
-    EVP_PKEY *pkey;
+    EVP_PKEY *pkey;		//pkey 与 public_key对应
 };
 
 static int x509_pubkey_decode(EVP_PKEY **pk, X509_PUBKEY *key);
@@ -69,8 +69,7 @@ int X509_PUBKEY_set(X509_PUBKEY **x, EVP_PKEY *pkey)
     if (pkey->ameth) {
         if (pkey->ameth->pub_encode) {
             if (!pkey->ameth->pub_encode(pk, pkey)) {
-                X509err(X509_F_X509_PUBKEY_SET,
-                        X509_R_PUBLIC_KEY_ENCODE_ERROR);
+                X509err(X509_F_X509_PUBKEY_SET, X509_R_PUBLIC_KEY_ENCODE_ERROR);
                 goto error;
             }
         } else {
@@ -98,8 +97,6 @@ int X509_PUBKEY_set(X509_PUBKEY **x, EVP_PKEY *pkey)
  * Returns 1 on success, 0 for a decode failure and -1 for a fatal
  * error e.g. malloc failure.
  */
-
-
 static int x509_pubkey_decode(EVP_PKEY **ppkey, X509_PUBKEY *key)
 {
     EVP_PKEY *pkey = EVP_PKEY_new();

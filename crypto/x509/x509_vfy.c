@@ -221,8 +221,7 @@ static int verify_chain(X509_STORE_CTX *ctx)
     if (ok == 0 || (ok = ctx->check_revocation(ctx)) == 0)
         return ok;
 
-    err = X509_chain_check_suiteb(&ctx->error_depth, NULL, ctx->chain,
-                                  ctx->param->flags);
+    err = X509_chain_check_suiteb(&ctx->error_depth, NULL, ctx->chain, ctx->param->flags);
     if (err != X509_V_OK) {
         if ((ok = verify_cb_cert(ctx, NULL, ctx->error_depth, err)) == 0)
             return ok;
@@ -2408,8 +2407,7 @@ void X509_STORE_CTX_set0_verified_chain(X509_STORE_CTX *ctx, STACK_OF(X509) *sk)
     ctx->chain = sk;
 }
 
-void X509_STORE_CTX_set_verify_cb(X509_STORE_CTX *ctx,
-                                  X509_STORE_CTX_verify_cb verify_cb)
+void X509_STORE_CTX_set_verify_cb(X509_STORE_CTX *ctx, X509_STORE_CTX_verify_cb verify_cb)
 {
     ctx->verify_cb = verify_cb;
 }

@@ -472,8 +472,7 @@ X509_CRL *X509_CRL_dup(X509_CRL *crl);
 X509_REVOKED *X509_REVOKED_dup(X509_REVOKED *rev);
 X509_REQ *X509_REQ_dup(X509_REQ *req);
 X509_ALGOR *X509_ALGOR_dup(X509_ALGOR *xn);
-int X509_ALGOR_set0(X509_ALGOR *alg, ASN1_OBJECT *aobj, int ptype,
-                    void *pval);
+int X509_ALGOR_set0(X509_ALGOR *alg, ASN1_OBJECT *aobj, int ptype, void *pval);
 void X509_ALGOR_get0(const ASN1_OBJECT **paobj, int *pptype,
                      const void **ppval, const X509_ALGOR *algor);
 void X509_ALGOR_set_md(X509_ALGOR *alg, const EVP_MD *md);
@@ -664,8 +663,7 @@ int X509_get_signature_type(const X509 *x);
  */
 X509_PUBKEY *X509_get_X509_PUBKEY(const X509 *x);
 const STACK_OF(X509_EXTENSION) *X509_get0_extensions(const X509 *x);
-void X509_get0_uids(const X509 *x, const ASN1_BIT_STRING **piuid,
-                    const ASN1_BIT_STRING **psuid);
+void X509_get0_uids(const X509 *x, const ASN1_BIT_STRING **piuid, const ASN1_BIT_STRING **psuid);
 const X509_ALGOR *X509_get0_tbs_sigalg(const X509 *x);
 
 EVP_PKEY *X509_get0_pubkey(const X509 *x);
@@ -677,8 +675,7 @@ long X509_REQ_get_version(const X509_REQ *req);
 int X509_REQ_set_version(X509_REQ *x, long version);
 X509_NAME *X509_REQ_get_subject_name(const X509_REQ *req);
 int X509_REQ_set_subject_name(X509_REQ *req, X509_NAME *name);
-void X509_REQ_get0_signature(const X509_REQ *req, const ASN1_BIT_STRING **psig,
-                             const X509_ALGOR **palg);
+void X509_REQ_get0_signature(const X509_REQ *req, const ASN1_BIT_STRING **psig, const X509_ALGOR **palg);
 int X509_REQ_get_signature_nid(const X509_REQ *req);
 int i2d_re_X509_REQ_tbs(X509_REQ *req, unsigned char **pp);
 int X509_REQ_set_pubkey(X509_REQ *x, EVP_PKEY *pkey);
@@ -689,25 +686,17 @@ int X509_REQ_extension_nid(int nid);
 int *X509_REQ_get_extension_nids(void);
 void X509_REQ_set_extension_nids(int *nids);
 STACK_OF(X509_EXTENSION) *X509_REQ_get_extensions(X509_REQ *req);
-int X509_REQ_add_extensions_nid(X509_REQ *req, STACK_OF(X509_EXTENSION) *exts,
-                                int nid);
+int X509_REQ_add_extensions_nid(X509_REQ *req, STACK_OF(X509_EXTENSION) *exts, int nid);
 int X509_REQ_add_extensions(X509_REQ *req, STACK_OF(X509_EXTENSION) *exts);
 int X509_REQ_get_attr_count(const X509_REQ *req);
 int X509_REQ_get_attr_by_NID(const X509_REQ *req, int nid, int lastpos);
-int X509_REQ_get_attr_by_OBJ(const X509_REQ *req, const ASN1_OBJECT *obj,
-                             int lastpos);
+int X509_REQ_get_attr_by_OBJ(const X509_REQ *req, const ASN1_OBJECT *obj, int lastpos);
 X509_ATTRIBUTE *X509_REQ_get_attr(const X509_REQ *req, int loc);
 X509_ATTRIBUTE *X509_REQ_delete_attr(X509_REQ *req, int loc);
 int X509_REQ_add1_attr(X509_REQ *req, X509_ATTRIBUTE *attr);
-int X509_REQ_add1_attr_by_OBJ(X509_REQ *req,
-                              const ASN1_OBJECT *obj, int type,
-                              const unsigned char *bytes, int len);
-int X509_REQ_add1_attr_by_NID(X509_REQ *req,
-                              int nid, int type,
-                              const unsigned char *bytes, int len);
-int X509_REQ_add1_attr_by_txt(X509_REQ *req,
-                              const char *attrname, int type,
-                              const unsigned char *bytes, int len);
+int X509_REQ_add1_attr_by_OBJ(X509_REQ *req, const ASN1_OBJECT *obj, int type, const unsigned char *bytes, int len);
+int X509_REQ_add1_attr_by_NID(X509_REQ *req, int nid, int type, const unsigned char *bytes, int len);
+int X509_REQ_add1_attr_by_txt(X509_REQ *req, const char *attrname, int type, const unsigned char *bytes, int len);
 
 int X509_CRL_set_version(X509_CRL *x, long version);
 int X509_CRL_set_issuer_name(X509_CRL *x, X509_NAME *name);

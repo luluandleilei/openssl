@@ -1579,8 +1579,7 @@ int SSL_CTX_check_private_key(const SSL_CTX *ctx)
         SSLerr(SSL_F_SSL_CTX_CHECK_PRIVATE_KEY, SSL_R_NO_PRIVATE_KEY_ASSIGNED);
         return 0;
     }
-    return X509_check_private_key
-            (ctx->cert->key->x509, ctx->cert->key->privatekey);
+    return X509_check_private_key(ctx->cert->key->x509, ctx->cert->key->privatekey);
 }
 
 /* Fix this function so that it takes an optional type parameter */
@@ -2369,14 +2368,12 @@ long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
         return (ctx->cert->cert_flags &= ~larg);
     case SSL_CTRL_SET_MIN_PROTO_VERSION:
         return ssl_check_allowed_versions(larg, ctx->max_proto_version)
-               && ssl_set_version_bound(ctx->method->version, (int)larg,
-                                        &ctx->min_proto_version);
+               && ssl_set_version_bound(ctx->method->version, (int)larg, &ctx->min_proto_version);
     case SSL_CTRL_GET_MIN_PROTO_VERSION:
         return ctx->min_proto_version;
     case SSL_CTRL_SET_MAX_PROTO_VERSION:
         return ssl_check_allowed_versions(ctx->min_proto_version, larg)
-               && ssl_set_version_bound(ctx->method->version, (int)larg,
-                                        &ctx->max_proto_version);
+               && ssl_set_version_bound(ctx->method->version, (int)larg, &ctx->max_proto_version);
     case SSL_CTRL_GET_MAX_PROTO_VERSION:
         return ctx->max_proto_version;
     default:
@@ -2408,8 +2405,7 @@ int ssl_cipher_id_cmp(const SSL_CIPHER *a, const SSL_CIPHER *b)
     return 0;
 }
 
-int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
-                          const SSL_CIPHER *const *bp)
+int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap, const SSL_CIPHER *const *bp)
 {
     if ((*ap)->id > (*bp)->id)
         return 1;
@@ -2506,13 +2502,14 @@ STACK_OF(SSL_CIPHER) *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
 }
 
 /** specify the ciphers to be used by default by the SSL_CTX */
+//Sets the list of available ciphers (TLSv1.2 and below) for ctx using the control string str.
+//The list of ciphers is inherited by all ssl objects created from ctx.
 int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *str)
 {
     STACK_OF(SSL_CIPHER) *sk;
 
     sk = ssl_create_cipher_list(ctx->method, ctx->tls13_ciphersuites,
-                                &ctx->cipher_list, &ctx->cipher_list_by_id, str,
-                                ctx->cert);
+			&ctx->cipher_list, &ctx->cipher_list_by_id, str, ctx->cert);
     /*
      * ssl_create_cipher_list may return an empty stack if it was unable to
      * find a cipher matching the given rule string (for example if the rule
@@ -2530,13 +2527,13 @@ int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *str)
 }
 
 /** specify the ciphers to be used by the SSL */
+//Sets the list of available ciphers (TLSv1.2 and below) for ssl using the control string str.
 int SSL_set_cipher_list(SSL *s, const char *str)
 {
     STACK_OF(SSL_CIPHER) *sk;
 
     sk = ssl_create_cipher_list(s->ctx->method, s->tls13_ciphersuites,
-                                &s->cipher_list, &s->cipher_list_by_id, str,
-                                s->cert);
+			&s->cipher_list, &s->cipher_list_by_id, str, s->cert);
     /* see comment in SSL_CTX_set_cipher_list */
     if (sk == NULL)
         return 0;
@@ -3174,16 +3171,13 @@ void *SSL_get_default_passwd_cb_userdata(SSL *s)
     return s->default_passwd_callback_userdata;
 }
 
-void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx,
-                                      int (*cb) (X509_STORE_CTX *, void *),
-                                      void *arg)
+void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb) (X509_STORE_CTX *, void *), void *arg)
 {
     ctx->app_verify_callback = cb;
     ctx->app_verify_arg = arg;
 }
 
-void SSL_CTX_set_verify(SSL_CTX *ctx, int mode,
-                        int (*cb) (int, X509_STORE_CTX *))
+void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*cb) (int, X509_STORE_CTX *))
 {
     ctx->verify_mode = mode;
     ctx->default_verify_callback = cb;
@@ -4460,18 +4454,13 @@ int SSL_get_security_level(const SSL *s)
     return s->cert->sec_level;
 }
 
-void SSL_set_security_callback(SSL *s,
-                               int (*cb) (const SSL *s, const SSL_CTX *ctx,
-                                          int op, int bits, int nid,
-                                          void *other, void *ex))
+void SSL_set_security_callback(SSL *s, 
+		int (*cb) (const SSL *s, const SSL_CTX *ctx, int op, int bits, int nid, void *other, void *ex))
 {
     s->cert->sec_cb = cb;
 }
 
-int (*SSL_get_security_callback(const SSL *s)) (const SSL *s,
-                                                const SSL_CTX *ctx, int op,
-                                                int bits, int nid, void *other,
-                                                void *ex) {
+int (*SSL_get_security_callback(const SSL *s)) (const SSL *s, const SSL_CTX *ctx, int op, int bits, int nid, void *other, void *ex) {
     return s->cert->sec_cb;
 }
 
@@ -4496,9 +4485,7 @@ int SSL_CTX_get_security_level(const SSL_CTX *ctx)
 }
 
 void SSL_CTX_set_security_callback(SSL_CTX *ctx,
-                                   int (*cb) (const SSL *s, const SSL_CTX *ctx,
-                                              int op, int bits, int nid,
-                                              void *other, void *ex))
+		int (*cb) (const SSL *s, const SSL_CTX *ctx, int op, int bits, int nid, void *other, void *ex))
 {
     ctx->cert->sec_cb = cb;
 }

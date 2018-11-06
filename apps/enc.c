@@ -65,8 +65,7 @@ const OPTIONS enc_options[] = {
     {"debug", OPT_DEBUG, '-', "Print debug info"},
     {"a", OPT_A, '-', "Base64 encode/decode, depending on encryption flag"},
     {"base64", OPT_A, '-', "Same as option -a"},
-    {"A", OPT_UPPER_A, '-',
-     "Used with -[base64|a] to specify base64 buffer as a single line"},
+    {"A", OPT_UPPER_A, '-', "Used with -[base64|a] to specify base64 buffer as a single line"},
     {"bufsize", OPT_BUFSIZE, 's', "Buffer size"},
     {"k", OPT_K, 's', "Passphrase"},
     {"kfile", OPT_KFILE, '<', "Read passphrase from file"},
@@ -150,8 +149,7 @@ int enc_main(int argc, char **argv)
             BIO_printf(bio_out, "Supported ciphers:\n");
             dec.bio = bio_out;
             dec.n = 0;
-            OBJ_NAME_do_all_sorted(OBJ_NAME_TYPE_CIPHER_METH,
-                                   show_ciphers, &dec);
+            OBJ_NAME_do_all_sorted(OBJ_NAME_TYPE_CIPHER_METH, show_ciphers, &dec);
             BIO_printf(bio_out, "\n");
             ret = 0;
             goto end;

@@ -415,8 +415,7 @@ int OPENSSL_isservice(void)
 
 void OPENSSL_die(const char *message, const char *file, int line)
 {
-    OPENSSL_showfatal("%s:%d: OpenSSL internal error: %s\n",
-                      file, line, message);
+    OPENSSL_showfatal("%s:%d: OpenSSL internal error: %s\n", file, line, message);
 #if !defined(_WIN32)
     abort();
 #else

@@ -404,32 +404,26 @@ typedef int (EVP_PBE_KEYGEN) (EVP_CIPHER_CTX *ctx, const char *pass,
                               int en_de);
 
 # ifndef OPENSSL_NO_RSA
-#  define EVP_PKEY_assign_RSA(pkey,rsa) EVP_PKEY_assign((pkey),EVP_PKEY_RSA,\
-                                        (char *)(rsa))
+#  define EVP_PKEY_assign_RSA(pkey,rsa) EVP_PKEY_assign((pkey),EVP_PKEY_RSA, (char *)(rsa))
 # endif
 
 # ifndef OPENSSL_NO_DSA
-#  define EVP_PKEY_assign_DSA(pkey,dsa) EVP_PKEY_assign((pkey),EVP_PKEY_DSA,\
-                                        (char *)(dsa))
+#  define EVP_PKEY_assign_DSA(pkey,dsa) EVP_PKEY_assign((pkey),EVP_PKEY_DSA, (char *)(dsa))
 # endif
 
 # ifndef OPENSSL_NO_DH
-#  define EVP_PKEY_assign_DH(pkey,dh) EVP_PKEY_assign((pkey),EVP_PKEY_DH,\
-                                        (char *)(dh))
+#  define EVP_PKEY_assign_DH(pkey,dh) EVP_PKEY_assign((pkey),EVP_PKEY_DH, (char *)(dh))
 # endif
 
 # ifndef OPENSSL_NO_EC
-#  define EVP_PKEY_assign_EC_KEY(pkey,eckey) EVP_PKEY_assign((pkey),EVP_PKEY_EC,\
-                                        (char *)(eckey))
+#  define EVP_PKEY_assign_EC_KEY(pkey,eckey) EVP_PKEY_assign((pkey),EVP_PKEY_EC, (char *)(eckey))
 # endif
 # ifndef OPENSSL_NO_SIPHASH
-#  define EVP_PKEY_assign_SIPHASH(pkey,shkey) EVP_PKEY_assign((pkey),EVP_PKEY_SIPHASH,\
-                                        (char *)(shkey))
+#  define EVP_PKEY_assign_SIPHASH(pkey,shkey) EVP_PKEY_assign((pkey),EVP_PKEY_SIPHASH, (char *)(shkey))
 # endif
 
 # ifndef OPENSSL_NO_POLY1305
-#  define EVP_PKEY_assign_POLY1305(pkey,polykey) EVP_PKEY_assign((pkey),EVP_PKEY_POLY1305,\
-                                        (char *)(polykey))
+#  define EVP_PKEY_assign_POLY1305(pkey,polykey) EVP_PKEY_assign((pkey),EVP_PKEY_POLY1305, (char *)(polykey))
 # endif
 
 /* Add some extra combinations */
@@ -939,22 +933,16 @@ const EVP_CIPHER *EVP_sm4_ctr(void);
 
 # if OPENSSL_API_COMPAT < 0x10100000L
 #  define OPENSSL_add_all_algorithms_conf() \
-    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS \
-                        | OPENSSL_INIT_ADD_ALL_DIGESTS \
-                        | OPENSSL_INIT_LOAD_CONFIG, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS | OPENSSL_INIT_LOAD_CONFIG, NULL)
 #  define OPENSSL_add_all_algorithms_noconf() \
-    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS \
-                        | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL)
+    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL)
 
 #  ifdef OPENSSL_LOAD_CONF
 #   define OpenSSL_add_all_algorithms() \
-    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS \
-                        | OPENSSL_INIT_ADD_ALL_DIGESTS \
-                        | OPENSSL_INIT_LOAD_CONFIG, NULL)
+     OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS | OPENSSL_INIT_LOAD_CONFIG, NULL)
 #  else
 #   define OpenSSL_add_all_algorithms() \
-    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS \
-                        | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL)
+     OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL)
 #  endif
 
 #  define OpenSSL_add_all_ciphers() \
@@ -1162,17 +1150,16 @@ int EVP_PBE_CipherInit(ASN1_OBJECT *pbe_obj, const char *pass, int passlen,
 /* Is a PKCS#5 v2.0 KDF */
 # define EVP_PBE_TYPE_KDF        0x2
 
-int EVP_PBE_alg_add_type(int pbe_type, int pbe_nid, int cipher_nid,
-                         int md_nid, EVP_PBE_KEYGEN *keygen);
-int EVP_PBE_alg_add(int nid, const EVP_CIPHER *cipher, const EVP_MD *md,
-                    EVP_PBE_KEYGEN *keygen);
-int EVP_PBE_find(int type, int pbe_nid, int *pcnid, int *pmnid,
-                 EVP_PBE_KEYGEN **pkeygen);
+int EVP_PBE_alg_add_type(int pbe_type, int pbe_nid, int cipher_nid, int md_nid, EVP_PBE_KEYGEN *keygen);
+int EVP_PBE_alg_add(int nid, const EVP_CIPHER *cipher, const EVP_MD *md, EVP_PBE_KEYGEN *keygen);
+int EVP_PBE_find(int type, int pbe_nid, int *pcnid, int *pmnid, EVP_PBE_KEYGEN **pkeygen);
 void EVP_PBE_cleanup(void);
 int EVP_PBE_get(int *ptype, int *ppbe_nid, size_t num);
 
 # define ASN1_PKEY_ALIAS         0x1
-# define ASN1_PKEY_DYNAMIC       0x2
+# define ASN1_PKEY_DYNAMIC       0x2	//EVP_PKEY_ASN1_METHOD对象是动态分配的？
+//If ASN1_PKEY_SIGPARAM_NULL is set, then the signature algorithm parameters are given the type V_ASN1_NULL by default, 
+//otherwise they will be given the type V_ASN1_UNDEF (i.e. the parameter is omitted). See X509_ALGOR_set0 for more information.
 # define ASN1_PKEY_SIGPARAM_NULL 0x4
 
 # define ASN1_PKEY_CTRL_PKCS7_SIGN       0x1
@@ -1192,110 +1179,52 @@ const EVP_PKEY_ASN1_METHOD *EVP_PKEY_asn1_find_str(ENGINE **pe,
                                                    const char *str, int len);
 int EVP_PKEY_asn1_add0(const EVP_PKEY_ASN1_METHOD *ameth);
 int EVP_PKEY_asn1_add_alias(int to, int from);
-int EVP_PKEY_asn1_get0_info(int *ppkey_id, int *pkey_base_id,
-                            int *ppkey_flags, const char **pinfo,
-                            const char **ppem_str,
-                            const EVP_PKEY_ASN1_METHOD *ameth);
+int EVP_PKEY_asn1_get0_info(int *ppkey_id, int *pkey_base_id, int *ppkey_flags, const char **pinfo, const char **ppem_str, const EVP_PKEY_ASN1_METHOD *ameth);
 
 const EVP_PKEY_ASN1_METHOD *EVP_PKEY_get0_asn1(const EVP_PKEY *pkey);
-EVP_PKEY_ASN1_METHOD *EVP_PKEY_asn1_new(int id, int flags,
-                                        const char *pem_str,
-                                        const char *info);
-void EVP_PKEY_asn1_copy(EVP_PKEY_ASN1_METHOD *dst,
-                        const EVP_PKEY_ASN1_METHOD *src);
+EVP_PKEY_ASN1_METHOD *EVP_PKEY_asn1_new(int id, int flags, const char *pem_str, const char *info);
+void EVP_PKEY_asn1_copy(EVP_PKEY_ASN1_METHOD *dst, const EVP_PKEY_ASN1_METHOD *src);
 void EVP_PKEY_asn1_free(EVP_PKEY_ASN1_METHOD *ameth);
 void EVP_PKEY_asn1_set_public(EVP_PKEY_ASN1_METHOD *ameth,
-                              int (*pub_decode) (EVP_PKEY *pk,
-                                                 X509_PUBKEY *pub),
-                              int (*pub_encode) (X509_PUBKEY *pub,
-                                                 const EVP_PKEY *pk),
-                              int (*pub_cmp) (const EVP_PKEY *a,
-                                              const EVP_PKEY *b),
-                              int (*pub_print) (BIO *out,
-                                                const EVP_PKEY *pkey,
-                                                int indent, ASN1_PCTX *pctx),
+                              int (*pub_decode) (EVP_PKEY *pk, X509_PUBKEY *pub),
+                              int (*pub_encode) (X509_PUBKEY *pub, const EVP_PKEY *pk),
+                              int (*pub_cmp) (const EVP_PKEY *a, const EVP_PKEY *b),
+                              int (*pub_print) (BIO *out, const EVP_PKEY *pkey, int indent, ASN1_PCTX *pctx),
                               int (*pkey_size) (const EVP_PKEY *pk),
                               int (*pkey_bits) (const EVP_PKEY *pk));
 void EVP_PKEY_asn1_set_private(EVP_PKEY_ASN1_METHOD *ameth,
-                               int (*priv_decode) (EVP_PKEY *pk,
-                                                   const PKCS8_PRIV_KEY_INFO
-                                                   *p8inf),
-                               int (*priv_encode) (PKCS8_PRIV_KEY_INFO *p8,
-                                                   const EVP_PKEY *pk),
-                               int (*priv_print) (BIO *out,
-                                                  const EVP_PKEY *pkey,
-                                                  int indent,
-                                                  ASN1_PCTX *pctx));
+                               int (*priv_decode) (EVP_PKEY *pk, const PKCS8_PRIV_KEY_INFO *p8inf),
+                               int (*priv_encode) (PKCS8_PRIV_KEY_INFO *p8, const EVP_PKEY *pk),
+                               int (*priv_print) (BIO *out, const EVP_PKEY *pkey, int indent, ASN1_PCTX *pctx));
 void EVP_PKEY_asn1_set_param(EVP_PKEY_ASN1_METHOD *ameth,
-                             int (*param_decode) (EVP_PKEY *pkey,
-                                                  const unsigned char **pder,
-                                                  int derlen),
-                             int (*param_encode) (const EVP_PKEY *pkey,
-                                                  unsigned char **pder),
+                             int (*param_decode) (EVP_PKEY *pkey, const unsigned char **pder, int derlen),
+                             int (*param_encode) (const EVP_PKEY *pkey, unsigned char **pder),
                              int (*param_missing) (const EVP_PKEY *pk),
-                             int (*param_copy) (EVP_PKEY *to,
-                                                const EVP_PKEY *from),
-                             int (*param_cmp) (const EVP_PKEY *a,
-                                               const EVP_PKEY *b),
-                             int (*param_print) (BIO *out,
-                                                 const EVP_PKEY *pkey,
-                                                 int indent,
-                                                 ASN1_PCTX *pctx));
+                             int (*param_copy) (EVP_PKEY *to, const EVP_PKEY *from),
+                             int (*param_cmp) (const EVP_PKEY *a, const EVP_PKEY *b),
+                             int (*param_print) (BIO *out, const EVP_PKEY *pkey, int indent, ASN1_PCTX *pctx));
 
-void EVP_PKEY_asn1_set_free(EVP_PKEY_ASN1_METHOD *ameth,
-                            void (*pkey_free) (EVP_PKEY *pkey));
+void EVP_PKEY_asn1_set_free(EVP_PKEY_ASN1_METHOD *ameth, void (*pkey_free) (EVP_PKEY *pkey));
 void EVP_PKEY_asn1_set_ctrl(EVP_PKEY_ASN1_METHOD *ameth,
-                            int (*pkey_ctrl) (EVP_PKEY *pkey, int op,
-                                              long arg1, void *arg2));
+                            int (*pkey_ctrl) (EVP_PKEY *pkey, int op, long arg1, void *arg2));
 void EVP_PKEY_asn1_set_item(EVP_PKEY_ASN1_METHOD *ameth,
-                            int (*item_verify) (EVP_MD_CTX *ctx,
-                                                const ASN1_ITEM *it,
-                                                void *asn,
-                                                X509_ALGOR *a,
-                                                ASN1_BIT_STRING *sig,
-                                                EVP_PKEY *pkey),
-                            int (*item_sign) (EVP_MD_CTX *ctx,
-                                              const ASN1_ITEM *it,
-                                              void *asn,
-                                              X509_ALGOR *alg1,
-                                              X509_ALGOR *alg2,
-                                              ASN1_BIT_STRING *sig));
+                            int (*item_verify) (EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn, X509_ALGOR *a, ASN1_BIT_STRING *sig, EVP_PKEY *pkey),
+                            int (*item_sign) (EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn, X509_ALGOR *alg1, X509_ALGOR *alg2, ASN1_BIT_STRING *sig));
 
-void EVP_PKEY_asn1_set_siginf(EVP_PKEY_ASN1_METHOD *ameth,
-                              int (*siginf_set) (X509_SIG_INFO *siginf,
-                                                 const X509_ALGOR *alg,
-                                                 const ASN1_STRING *sig));
+void EVP_PKEY_asn1_set_siginf(EVP_PKEY_ASN1_METHOD *ameth, int (*siginf_set) (X509_SIG_INFO *siginf, const X509_ALGOR *alg, const ASN1_STRING *sig));
 
-void EVP_PKEY_asn1_set_check(EVP_PKEY_ASN1_METHOD *ameth,
-                             int (*pkey_check) (const EVP_PKEY *pk));
+void EVP_PKEY_asn1_set_check(EVP_PKEY_ASN1_METHOD *ameth, int (*pkey_check) (const EVP_PKEY *pk));
 
-void EVP_PKEY_asn1_set_public_check(EVP_PKEY_ASN1_METHOD *ameth,
-                                    int (*pkey_pub_check) (const EVP_PKEY *pk));
+void EVP_PKEY_asn1_set_public_check(EVP_PKEY_ASN1_METHOD *ameth, int (*pkey_pub_check) (const EVP_PKEY *pk));
 
-void EVP_PKEY_asn1_set_param_check(EVP_PKEY_ASN1_METHOD *ameth,
-                                   int (*pkey_param_check) (const EVP_PKEY *pk));
+void EVP_PKEY_asn1_set_param_check(EVP_PKEY_ASN1_METHOD *ameth, int (*pkey_param_check) (const EVP_PKEY *pk));
 
-void EVP_PKEY_asn1_set_set_priv_key(EVP_PKEY_ASN1_METHOD *ameth,
-                                    int (*set_priv_key) (EVP_PKEY *pk,
-                                                         const unsigned char
-                                                            *priv,
-                                                         size_t len));
-void EVP_PKEY_asn1_set_set_pub_key(EVP_PKEY_ASN1_METHOD *ameth,
-                                   int (*set_pub_key) (EVP_PKEY *pk,
-                                                       const unsigned char *pub,
-                                                       size_t len));
-void EVP_PKEY_asn1_set_get_priv_key(EVP_PKEY_ASN1_METHOD *ameth,
-                                    int (*get_priv_key) (const EVP_PKEY *pk,
-                                                         unsigned char *priv,
-                                                         size_t *len));
-void EVP_PKEY_asn1_set_get_pub_key(EVP_PKEY_ASN1_METHOD *ameth,
-                                   int (*get_pub_key) (const EVP_PKEY *pk,
-                                                       unsigned char *pub,
-                                                       size_t *len));
+void EVP_PKEY_asn1_set_set_priv_key(EVP_PKEY_ASN1_METHOD *ameth, int (*set_priv_key) (EVP_PKEY *pk, const unsigned char *priv, size_t len));
+void EVP_PKEY_asn1_set_set_pub_key(EVP_PKEY_ASN1_METHOD *ameth, int (*set_pub_key) (EVP_PKEY *pk, const unsigned char *pub, size_t len));
+void EVP_PKEY_asn1_set_get_priv_key(EVP_PKEY_ASN1_METHOD *ameth, int (*get_priv_key) (const EVP_PKEY *pk, unsigned char *priv, size_t *len));
+void EVP_PKEY_asn1_set_get_pub_key(EVP_PKEY_ASN1_METHOD *ameth, int (*get_pub_key) (const EVP_PKEY *pk, unsigned char *pub, size_t *len));
 
-void EVP_PKEY_asn1_set_security_bits(EVP_PKEY_ASN1_METHOD *ameth,
-                                     int (*pkey_security_bits) (const EVP_PKEY
-                                                                *pk));
+void EVP_PKEY_asn1_set_security_bits(EVP_PKEY_ASN1_METHOD *ameth, int (*pkey_security_bits) (const EVP_PKEY *pk));
 
 # define EVP_PKEY_OP_UNDEFINED           0
 # define EVP_PKEY_OP_PARAMGEN            (1<<1)

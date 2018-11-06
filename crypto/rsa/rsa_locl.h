@@ -78,8 +78,7 @@ struct rsa_meth_st {
     /* Can be null */
     int (*rsa_mod_exp) (BIGNUM *r0, const BIGNUM *I, RSA *rsa, BN_CTX *ctx);
     /* Can be null */
-    int (*bn_mod_exp) (BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
-                       const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx);
+    int (*bn_mod_exp) (BIGNUM *r, const BIGNUM *a, const BIGNUM *p, const BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *m_ctx);
     /* called at new */
     int (*init) (RSA *rsa);
     /* called at free */
@@ -94,13 +93,8 @@ struct rsa_meth_st {
      * this to work the RSA_public_decrypt() and RSA_private_encrypt() should
      * *NOT* be used RSA_sign(), RSA_verify() should be used instead.
      */
-    int (*rsa_sign) (int type,
-                     const unsigned char *m, unsigned int m_length,
-                     unsigned char *sigret, unsigned int *siglen,
-                     const RSA *rsa);
-    int (*rsa_verify) (int dtype, const unsigned char *m,
-                       unsigned int m_length, const unsigned char *sigbuf,
-                       unsigned int siglen, const RSA *rsa);
+    int (*rsa_sign) (int type, const unsigned char *m, unsigned int m_length, unsigned char *sigret, unsigned int *siglen, const RSA *rsa);
+    int (*rsa_verify) (int dtype, const unsigned char *m, unsigned int m_length, const unsigned char *sigbuf, unsigned int siglen, const RSA *rsa);
     /*
      * If this callback is NULL, the builtin software RSA key-gen will be
      * used. This is for behavioural compatibility whilst the code gets
@@ -108,8 +102,7 @@ struct rsa_meth_st {
      * things as "builtin software" implementations.
      */
     int (*rsa_keygen) (RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb);
-    int (*rsa_multi_prime_keygen) (RSA *rsa, int bits, int primes,
-                                   BIGNUM *e, BN_GENCB *cb);
+    int (*rsa_multi_prime_keygen) (RSA *rsa, int bits, int primes, BIGNUM *e, BN_GENCB *cb);
 };
 
 extern int int_rsa_verify(int dtype, const unsigned char *m,

@@ -175,8 +175,7 @@ int EVP_PKEY_up_ref(EVP_PKEY *pkey)
  * is NULL just return 1 or 0 if the algorithm exists.
  */
 
-static int pkey_set_type(EVP_PKEY *pkey, ENGINE *e, int type, const char *str,
-                         int len)
+static int pkey_set_type(EVP_PKEY *pkey, ENGINE *e, int type, const char *str, int len)
 {
     const EVP_PKEY_ASN1_METHOD *ameth;
     ENGINE **eptr = (e == NULL) ? &e :  NULL;
@@ -620,17 +619,14 @@ static void EVP_PKEY_free_it(EVP_PKEY *x)
 #endif
 }
 
-static int unsup_alg(BIO *out, const EVP_PKEY *pkey, int indent,
-                     const char *kstr)
+static int unsup_alg(BIO *out, const EVP_PKEY *pkey, int indent, const char *kstr)
 {
     BIO_indent(out, indent, 128);
-    BIO_printf(out, "%s algorithm \"%s\" unsupported\n",
-               kstr, OBJ_nid2ln(pkey->type));
+    BIO_printf(out, "%s algorithm \"%s\" unsupported\n", kstr, OBJ_nid2ln(pkey->type));
     return 1;
 }
 
-int EVP_PKEY_print_public(BIO *out, const EVP_PKEY *pkey,
-                          int indent, ASN1_PCTX *pctx)
+int EVP_PKEY_print_public(BIO *out, const EVP_PKEY *pkey, int indent, ASN1_PCTX *pctx)
 {
     if (pkey->ameth && pkey->ameth->pub_print)
         return pkey->ameth->pub_print(out, pkey, indent, pctx);
@@ -647,8 +643,7 @@ int EVP_PKEY_print_private(BIO *out, const EVP_PKEY *pkey,
     return unsup_alg(out, pkey, indent, "Private Key");
 }
 
-int EVP_PKEY_print_params(BIO *out, const EVP_PKEY *pkey,
-                          int indent, ASN1_PCTX *pctx)
+int EVP_PKEY_print_params(BIO *out, const EVP_PKEY *pkey, int indent, ASN1_PCTX *pctx)
 {
     if (pkey->ameth && pkey->ameth->param_print)
         return pkey->ameth->param_print(out, pkey, indent, pctx);
@@ -667,13 +662,11 @@ int EVP_PKEY_get_default_digest_nid(EVP_PKEY *pkey, int *pnid)
     return evp_pkey_asn1_ctrl(pkey, ASN1_PKEY_CTRL_DEFAULT_MD_NID, 0, pnid);
 }
 
-int EVP_PKEY_set1_tls_encodedpoint(EVP_PKEY *pkey,
-                               const unsigned char *pt, size_t ptlen)
+int EVP_PKEY_set1_tls_encodedpoint(EVP_PKEY *pkey, const unsigned char *pt, size_t ptlen)
 {
     if (ptlen > INT_MAX)
         return 0;
-    if (evp_pkey_asn1_ctrl(pkey, ASN1_PKEY_CTRL_SET1_TLS_ENCPT, ptlen,
-                           (void *)pt) <= 0)
+    if (evp_pkey_asn1_ctrl(pkey, ASN1_PKEY_CTRL_SET1_TLS_ENCPT, ptlen, (void *)pt) <= 0)
         return 0;
     return 1;
 }

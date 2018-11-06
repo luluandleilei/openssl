@@ -122,8 +122,7 @@ EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
     int slen;
     EVP_PKEY *ret = NULL;
 
-    if (!PEM_bytes_read_bio(&data, &len, &nm, PEM_STRING_PARAMETERS,
-                            bp, 0, NULL))
+    if (!PEM_bytes_read_bio(&data, &len, &nm, PEM_STRING_PARAMETERS, bp, 0, NULL))
         return NULL;
     p = data;
 

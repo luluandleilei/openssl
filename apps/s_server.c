@@ -2816,8 +2816,7 @@ static int init_ssl_connection(SSL *con)
 
         verify_err = SSL_get_verify_result(con);
         if (verify_err != X509_V_OK) {
-            BIO_printf(bio_err, "verify error:%s\n",
-                       X509_verify_cert_error_string(verify_err));
+            BIO_printf(bio_err, "verify error:%s\n", X509_verify_cert_error_string(verify_err));
         }
         /* Always print any error messages */
         ERR_print_errors(bio_err);

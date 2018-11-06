@@ -152,9 +152,7 @@ err:
 /*
  * Register a new index.
  */
-int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp,
-                            CRYPTO_EX_new *new_func, CRYPTO_EX_dup *dup_func,
-                            CRYPTO_EX_free *free_func)
+int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp, CRYPTO_EX_new *new_func, CRYPTO_EX_dup *dup_func, CRYPTO_EX_free *free_func)
 {
     int toret = -1;
     EX_CALLBACK *a;
@@ -167,8 +165,7 @@ int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp,
         ip->meth = sk_EX_CALLBACK_new_null();
         /* We push an initial value on the stack because the SSL
          * "app_data" routines use ex_data index zero.  See RT 3710. */
-        if (ip->meth == NULL
-            || !sk_EX_CALLBACK_push(ip->meth, NULL)) {
+        if (ip->meth == NULL || !sk_EX_CALLBACK_push(ip->meth, NULL)) {
             CRYPTOerr(CRYPTO_F_CRYPTO_GET_EX_NEW_INDEX, ERR_R_MALLOC_FAILURE);
             goto err;
         }
@@ -218,6 +215,7 @@ int CRYPTO_new_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad)
 
     ad->sk = NULL;
 
+	/* backup the EX_CALLBACK of ip into storage, so we can release the lock quickly ? */
     mx = sk_EX_CALLBACK_num(ip->meth);
     if (mx > 0) {
         if (mx < (int)OSSL_NELEM(stack))
@@ -237,8 +235,7 @@ int CRYPTO_new_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad)
     for (i = 0; i < mx; i++) {
         if (storage[i] && storage[i]->new_func) {
             ptr = CRYPTO_get_ex_data(ad, i);
-            storage[i]->new_func(obj, ptr, ad, i,
-                                 storage[i]->argl, storage[i]->argp);
+            storage[i]->new_func(obj, ptr, ad, i, storage[i]->argl, storage[i]->argp);
         }
     }
     if (storage != stack)
@@ -250,8 +247,7 @@ int CRYPTO_new_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad)
  * Duplicate a CRYPTO_EX_DATA variable - including calling dup() callbacks
  * for each index in the class used by this variable
  */
-int CRYPTO_dup_ex_data(int class_index, CRYPTO_EX_DATA *to,
-                       const CRYPTO_EX_DATA *from)
+int CRYPTO_dup_ex_data(int class_index, CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from)
 {
     int mx, j, i;
     void *ptr;
@@ -329,6 +325,7 @@ void CRYPTO_free_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad)
     if ((ip = get_and_lock(class_index)) == NULL)
         goto err;
 
+	/* backup the EX_CALLBACK of ip into storage, so we can release the lock quickly ? */
     mx = sk_EX_CALLBACK_num(ip->meth);
     if (mx > 0) {
         if (mx < (int)OSSL_NELEM(stack))
@@ -342,9 +339,9 @@ void CRYPTO_free_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad)
     CRYPTO_THREAD_unlock(ex_data_lock);
 
     for (i = 0; i < mx; i++) {
-        if (storage != NULL)
-            f = storage[i];
-        else {
+        if (storage != NULL) {
+			 f = storage[i];
+		} else {
             CRYPTO_THREAD_write_lock(ex_data_lock);
             f = sk_EX_CALLBACK_value(ip->meth, i);
             CRYPTO_THREAD_unlock(ex_data_lock);

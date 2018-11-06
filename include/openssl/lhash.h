@@ -120,12 +120,9 @@ void OPENSSL_LH_node_usage_stats_bio(const OPENSSL_LHASH *lh, BIO *out);
 
 # define DEFINE_LHASH_OF(type) \
     LHASH_OF(type) { union lh_##type##_dummy { void* d1; unsigned long d2; int d3; } dummy; }; \
-    static ossl_inline LHASH_OF(type) * \
-        lh_##type##_new(unsigned long (*hfn)(const type *), \
-                        int (*cfn)(const type *, const type *)) \
+    static ossl_inline LHASH_OF(type) * lh_##type##_new(unsigned long (*hfn)(const type *), int (*cfn)(const type *, const type *)) \
     { \
-        return (LHASH_OF(type) *) \
-            OPENSSL_LH_new((OPENSSL_LH_HASHFUNC)hfn, (OPENSSL_LH_COMPFUNC)cfn); \
+        return (LHASH_OF(type) *) OPENSSL_LH_new((OPENSSL_LH_HASHFUNC)hfn, (OPENSSL_LH_COMPFUNC)cfn); \
     } \
     static ossl_inline void lh_##type##_free(LHASH_OF(type) *lh) \
     { \
@@ -171,8 +168,7 @@ void OPENSSL_LH_node_usage_stats_bio(const OPENSSL_LHASH *lh, BIO *out);
     { \
         OPENSSL_LH_set_down_load((OPENSSL_LHASH *)lh, dl); \
     } \
-    static ossl_inline void lh_##type##_doall(LHASH_OF(type) *lh, \
-                                         void (*doall)(type *)) \
+    static ossl_inline void lh_##type##_doall(LHASH_OF(type) *lh, void (*doall)(type *)) \
     { \
         OPENSSL_LH_doall((OPENSSL_LHASH *)lh, (OPENSSL_LH_DOALL_FUNC)doall); \
     } \

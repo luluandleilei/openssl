@@ -24,7 +24,7 @@
 static int allow_customize = 1;
 
 static void *(*malloc_impl)(size_t, const char *, int)
-    = CRYPTO_malloc;
+	= CRYPTO_malloc;
 static void *(*realloc_impl)(void *, size_t, const char *, int)
     = CRYPTO_realloc;
 static void (*free_impl)(void *, const char *, int)
@@ -57,10 +57,7 @@ static int call_malloc_debug = 0;
 # define FAILTEST() /* empty */
 #endif
 
-int CRYPTO_set_mem_functions(
-        void *(*m)(size_t, const char *, int),
-        void *(*r)(void *, size_t, const char *, int),
-        void (*f)(void *, const char *, int))
+int CRYPTO_set_mem_functions( void *(*m)(size_t, const char *, int), void *(*r)(void *, size_t, const char *, int), void (*f)(void *, const char *, int))
 {
     if (!allow_customize)
         return 0;

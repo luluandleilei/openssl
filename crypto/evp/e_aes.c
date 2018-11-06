@@ -54,10 +54,7 @@ typedef struct {
         AES_KEY ks;
     } ks1, ks2;                 /* AES key schedules to use */
     XTS128_CONTEXT xts;
-    void (*stream) (const unsigned char *in,
-                    unsigned char *out, size_t length,
-                    const AES_KEY *key1, const AES_KEY *key2,
-                    const unsigned char iv[16]);
+    void (*stream) (const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key1, const AES_KEY *key2, const unsigned char iv[16]);
 } EVP_AES_XTS_CTX;
 
 typedef struct {
@@ -102,47 +99,26 @@ typedef struct {
 #define MAXBITCHUNK     ((size_t)1<<(sizeof(size_t)*8-4))
 
 #ifdef VPAES_ASM
-int vpaes_set_encrypt_key(const unsigned char *userKey, int bits,
-                          AES_KEY *key);
-int vpaes_set_decrypt_key(const unsigned char *userKey, int bits,
-                          AES_KEY *key);
+int vpaes_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
+int vpaes_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
 
-void vpaes_encrypt(const unsigned char *in, unsigned char *out,
-                   const AES_KEY *key);
-void vpaes_decrypt(const unsigned char *in, unsigned char *out,
-                   const AES_KEY *key);
+void vpaes_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
+void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
-void vpaes_cbc_encrypt(const unsigned char *in,
-                       unsigned char *out,
-                       size_t length,
-                       const AES_KEY *key, unsigned char *ivec, int enc);
+void vpaes_cbc_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key, unsigned char *ivec, int enc);
 #endif
 #ifdef BSAES_ASM
-void bsaes_cbc_encrypt(const unsigned char *in, unsigned char *out,
-                       size_t length, const AES_KEY *key,
-                       unsigned char ivec[16], int enc);
-void bsaes_ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out,
-                                size_t len, const AES_KEY *key,
-                                const unsigned char ivec[16]);
-void bsaes_xts_encrypt(const unsigned char *inp, unsigned char *out,
-                       size_t len, const AES_KEY *key1,
-                       const AES_KEY *key2, const unsigned char iv[16]);
-void bsaes_xts_decrypt(const unsigned char *inp, unsigned char *out,
-                       size_t len, const AES_KEY *key1,
-                       const AES_KEY *key2, const unsigned char iv[16]);
+void bsaes_cbc_encrypt(const unsigned char *in, unsigned char *out, size_t length, const AES_KEY *key, unsigned char ivec[16], int enc);
+void bsaes_ctr32_encrypt_blocks(const unsigned char *in, unsigned char *out, size_t len, const AES_KEY *key, const unsigned char ivec[16]);
+void bsaes_xts_encrypt(const unsigned char *inp, unsigned char *out, size_t len, const AES_KEY *key1, const AES_KEY *key2, const unsigned char iv[16]);
+void bsaes_xts_decrypt(const unsigned char *inp, unsigned char *out, size_t len, const AES_KEY *key1, const AES_KEY *key2, const unsigned char iv[16]);
 #endif
 #ifdef AES_CTR_ASM
-void AES_ctr32_encrypt(const unsigned char *in, unsigned char *out,
-                       size_t blocks, const AES_KEY *key,
-                       const unsigned char ivec[AES_BLOCK_SIZE]);
+void AES_ctr32_encrypt(const unsigned char *in, unsigned char *out, size_t blocks, const AES_KEY *key, const unsigned char ivec[AES_BLOCK_SIZE]);
 #endif
 #ifdef AES_XTS_ASM
-void AES_xts_encrypt(const unsigned char *inp, unsigned char *out, size_t len,
-                     const AES_KEY *key1, const AES_KEY *key2,
-                     const unsigned char iv[16]);
-void AES_xts_decrypt(const unsigned char *inp, unsigned char *out, size_t len,
-                     const AES_KEY *key1, const AES_KEY *key2,
-                     const unsigned char iv[16]);
+void AES_xts_encrypt(const unsigned char *inp, unsigned char *out, size_t len, const AES_KEY *key1, const AES_KEY *key2, const unsigned char iv[16]);
+void AES_xts_decrypt(const unsigned char *inp, unsigned char *out, size_t len, const AES_KEY *key1, const AES_KEY *key2, const unsigned char iv[16]);
 #endif
 
 /* increment counter (64-bit int) by 1 */
@@ -246,18 +222,11 @@ void aesni_ccm64_decrypt_blocks(const unsigned char *in,
                                 unsigned char cmac[16]);
 
 # if defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)
-size_t aesni_gcm_encrypt(const unsigned char *in,
-                         unsigned char *out,
-                         size_t len,
-                         const void *key, unsigned char ivec[16], u64 *Xi);
+size_t aesni_gcm_encrypt(const unsigned char *in, unsigned char *out, size_t len, const void *key, unsigned char ivec[16], u64 *Xi);
 #  define AES_gcm_encrypt aesni_gcm_encrypt
-size_t aesni_gcm_decrypt(const unsigned char *in,
-                         unsigned char *out,
-                         size_t len,
-                         const void *key, unsigned char ivec[16], u64 *Xi);
+size_t aesni_gcm_decrypt(const unsigned char *in, unsigned char *out, size_t len, const void *key, unsigned char ivec[16], u64 *Xi);
 #  define AES_gcm_decrypt aesni_gcm_decrypt
-void gcm_ghash_avx(u64 Xi[2], const u128 Htable[16], const u8 *in,
-                   size_t len);
+void gcm_ghash_avx(u64 Xi[2], const u128 Htable[16], const u8 *in, size_t len);
 #  define AES_GCM_ASM(gctx)       (gctx->ctr==aesni_ctr32_encrypt_blocks && \
                                  gctx->gcm.ghash==gcm_ghash_avx)
 #  define AES_GCM_ASM2(gctx)      (gctx->gcm.block==(block128_f)aesni_encrypt && \
@@ -265,8 +234,7 @@ void gcm_ghash_avx(u64 Xi[2], const u128 Htable[16], const u8 *in,
 #  undef AES_GCM_ASM2          /* minor size optimization */
 # endif
 
-static int aesni_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                          const unsigned char *iv, int enc)
+static int aesni_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     int ret, mode;
     EVP_AES_KEY *dat = EVP_C_DATA(EVP_AES_KEY,ctx);
@@ -274,14 +242,11 @@ static int aesni_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
     mode = EVP_CIPHER_CTX_mode(ctx);
     if ((mode == EVP_CIPH_ECB_MODE || mode == EVP_CIPH_CBC_MODE)
         && !enc) {
-        ret = aesni_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                    &dat->ks.ks);
+        ret = aesni_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) aesni_decrypt;
-        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ?
-            (cbc128_f) aesni_cbc_encrypt : NULL;
+        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ? (cbc128_f) aesni_cbc_encrypt : NULL;
     } else {
-        ret = aesni_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                    &dat->ks.ks);
+        ret = aesni_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) aesni_encrypt;
         if (mode == EVP_CIPH_CBC_MODE)
             dat->stream.cbc = (cbc128_f) aesni_cbc_encrypt;
@@ -377,11 +342,9 @@ static int aesni_gcm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 }
 
 # define aesni_gcm_cipher aes_gcm_cipher
-static int aesni_gcm_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                            const unsigned char *in, size_t len);
+static int aesni_gcm_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len);
 
-static int aesni_xts_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                              const unsigned char *iv, int enc)
+static int aesni_xts_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     EVP_AES_XTS_CTX *xctx = EVP_C_DATA(EVP_AES_XTS_CTX,ctx);
     if (!iv && !key)
@@ -418,11 +381,9 @@ static int aesni_xts_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 }
 
 # define aesni_xts_cipher aes_xts_cipher
-static int aesni_xts_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                            const unsigned char *in, size_t len);
+static int aesni_xts_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len);
 
-static int aesni_ccm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                              const unsigned char *iv, int enc)
+static int aesni_ccm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     EVP_AES_CCM_CTX *cctx = EVP_C_DATA(EVP_AES_CCM_CTX,ctx);
     if (!iv && !key)
@@ -444,25 +405,13 @@ static int aesni_ccm_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 }
 
 # define aesni_ccm_cipher aes_ccm_cipher
-static int aesni_ccm_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                            const unsigned char *in, size_t len);
+static int aesni_ccm_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len);
 
 # ifndef OPENSSL_NO_OCB
-void aesni_ocb_encrypt(const unsigned char *in, unsigned char *out,
-                       size_t blocks, const void *key,
-                       size_t start_block_num,
-                       unsigned char offset_i[16],
-                       const unsigned char L_[][16],
-                       unsigned char checksum[16]);
-void aesni_ocb_decrypt(const unsigned char *in, unsigned char *out,
-                       size_t blocks, const void *key,
-                       size_t start_block_num,
-                       unsigned char offset_i[16],
-                       const unsigned char L_[][16],
-                       unsigned char checksum[16]);
+void aesni_ocb_encrypt(const unsigned char *in, unsigned char *out, size_t blocks, const void *key, size_t start_block_num, unsigned char offset_i[16], const unsigned char L_[][16], unsigned char checksum[16]);
+void aesni_ocb_decrypt(const unsigned char *in, unsigned char *out, size_t blocks, const void *key, size_t start_block_num, unsigned char offset_i[16], const unsigned char L_[][16], unsigned char checksum[16]);
 
-static int aesni_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                              const unsigned char *iv, int enc)
+static int aesni_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     EVP_AES_OCB_CTX *octx = EVP_C_DATA(EVP_AES_OCB_CTX,ctx);
     if (!iv && !key)
@@ -474,16 +423,9 @@ static int aesni_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
              * needs both. We could possibly optimise to remove setting the
              * decrypt for an encryption operation.
              */
-            aesni_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                  &octx->ksenc.ks);
-            aesni_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                  &octx->ksdec.ks);
-            if (!CRYPTO_ocb128_init(&octx->ocb,
-                                    &octx->ksenc.ks, &octx->ksdec.ks,
-                                    (block128_f) aesni_encrypt,
-                                    (block128_f) aesni_decrypt,
-                                    enc ? aesni_ocb_encrypt
-                                        : aesni_ocb_decrypt))
+            aesni_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &octx->ksenc.ks);
+            aesni_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &octx->ksdec.ks);
+            if (!CRYPTO_ocb128_init(&octx->ocb, &octx->ksenc.ks, &octx->ksdec.ks, (block128_f) aesni_encrypt, (block128_f) aesni_decrypt, enc ? aesni_ocb_encrypt : aesni_ocb_decrypt))
                 return 0;
         }
         while (0);
@@ -494,8 +436,7 @@ static int aesni_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
         if (iv == NULL && octx->iv_set)
             iv = octx->iv;
         if (iv) {
-            if (CRYPTO_ocb128_setiv(&octx->ocb, iv, octx->ivlen, octx->taglen)
-                != 1)
+            if (CRYPTO_ocb128_setiv(&octx->ocb, iv, octx->ivlen, octx->taglen) != 1)
                 return 0;
             octx->iv_set = 1;
         }
@@ -512,8 +453,7 @@ static int aesni_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 }
 
 #  define aesni_ocb_cipher aes_ocb_cipher
-static int aesni_ocb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                            const unsigned char *in, size_t len);
+static int aesni_ocb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len);
 # endif                        /* OPENSSL_NO_OCB */
 
 # define BLOCK_CIPHER_generic(nid,keylen,blocksize,ivlen,nmode,mode,MODE,flags) \
@@ -2411,19 +2351,16 @@ static int s390x_aes_ccm_ctrl(EVP_CIPHER_CTX *c, int type, int arg, void *ptr)
 #  define S390X_aes_256_ocb_CAPABLE	0
 
 #  define s390x_aes_ocb_init_key aes_ocb_init_key
-static int s390x_aes_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                                  const unsigned char *iv, int enc);
+static int s390x_aes_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc);
 #  define s390x_aes_ocb_cipher aes_ocb_cipher
-static int s390x_aes_ocb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                                const unsigned char *in, size_t len);
+static int s390x_aes_ocb_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len);
 #  define s390x_aes_ocb_cleanup aes_ocb_cleanup
 static int s390x_aes_ocb_cleanup(EVP_CIPHER_CTX *);
 #  define s390x_aes_ocb_ctrl aes_ocb_ctrl
 static int s390x_aes_ocb_ctrl(EVP_CIPHER_CTX *, int type, int arg, void *ptr);
 # endif
 
-# define BLOCK_CIPHER_generic(nid,keylen,blocksize,ivlen,nmode,mode,	\
-                              MODE,flags)				\
+# define BLOCK_CIPHER_generic(nid,keylen,blocksize,ivlen,nmode,mode, MODE,flags)				\
 static const EVP_CIPHER s390x_aes_##keylen##_##mode = {			\
     nid##_##keylen##_##nmode,blocksize,					\
     keylen / 8,								\
@@ -2575,20 +2512,16 @@ void HWAES_xts_decrypt(const unsigned char *inp, unsigned char *out,
         BLOCK_CIPHER_generic(nid,keylen,1,16,cfb8,cfb8,CFB,flags)       \
         BLOCK_CIPHER_generic(nid,keylen,1,16,ctr,ctr,CTR,flags)
 
-static int aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
-                        const unsigned char *iv, int enc)
+static int aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key, const unsigned char *iv, int enc)
 {
     int ret, mode;
     EVP_AES_KEY *dat = EVP_C_DATA(EVP_AES_KEY,ctx);
 
     mode = EVP_CIPHER_CTX_mode(ctx);
-    if ((mode == EVP_CIPH_ECB_MODE || mode == EVP_CIPH_CBC_MODE)
-        && !enc) {
+    if ((mode == EVP_CIPH_ECB_MODE || mode == EVP_CIPH_CBC_MODE) && !enc) {
 #ifdef HWAES_CAPABLE
         if (HWAES_CAPABLE) {
-            ret = HWAES_set_decrypt_key(key,
-                                        EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                        &dat->ks.ks);
+            ret = HWAES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
             dat->block = (block128_f) HWAES_decrypt;
             dat->stream.cbc = NULL;
 # ifdef HWAES_cbc_encrypt
@@ -2599,35 +2532,27 @@ static int aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 #endif
 #ifdef BSAES_CAPABLE
         if (BSAES_CAPABLE && mode == EVP_CIPH_CBC_MODE) {
-            ret = AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                      &dat->ks.ks);
+            ret = AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
             dat->block = (block128_f) AES_decrypt;
             dat->stream.cbc = (cbc128_f) bsaes_cbc_encrypt;
         } else
 #endif
 #ifdef VPAES_CAPABLE
         if (VPAES_CAPABLE) {
-            ret = vpaes_set_decrypt_key(key,
-                                        EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                        &dat->ks.ks);
+            ret = vpaes_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
             dat->block = (block128_f) vpaes_decrypt;
-            dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ?
-                (cbc128_f) vpaes_cbc_encrypt : NULL;
+            dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ? (cbc128_f) vpaes_cbc_encrypt : NULL;
         } else
 #endif
         {
-            ret = AES_set_decrypt_key(key,
-                                      EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                      &dat->ks.ks);
+            ret = AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
             dat->block = (block128_f) AES_decrypt;
-            dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ?
-                (cbc128_f) AES_cbc_encrypt : NULL;
+            dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ? (cbc128_f) AES_cbc_encrypt : NULL;
         }
     } else
 #ifdef HWAES_CAPABLE
     if (HWAES_CAPABLE) {
-        ret = HWAES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                    &dat->ks.ks);
+        ret = HWAES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) HWAES_encrypt;
         dat->stream.cbc = NULL;
 # ifdef HWAES_cbc_encrypt
@@ -2645,27 +2570,22 @@ static int aes_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
 #endif
 #ifdef BSAES_CAPABLE
     if (BSAES_CAPABLE && mode == EVP_CIPH_CTR_MODE) {
-        ret = AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                  &dat->ks.ks);
+        ret = AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) AES_encrypt;
         dat->stream.ctr = (ctr128_f) bsaes_ctr32_encrypt_blocks;
     } else
 #endif
 #ifdef VPAES_CAPABLE
     if (VPAES_CAPABLE) {
-        ret = vpaes_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                    &dat->ks.ks);
+        ret = vpaes_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) vpaes_encrypt;
-        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ?
-            (cbc128_f) vpaes_cbc_encrypt : NULL;
+        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ? (cbc128_f) vpaes_cbc_encrypt : NULL;
     } else
 #endif
     {
-        ret = AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                  &dat->ks.ks);
+        ret = AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &dat->ks.ks);
         dat->block = (block128_f) AES_encrypt;
-        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ?
-            (cbc128_f) AES_cbc_encrypt : NULL;
+        dat->stream.cbc = mode == EVP_CIPH_CBC_MODE ? (cbc128_f) AES_cbc_encrypt : NULL;
 #ifdef AES_CTR_ASM
         if (mode == EVP_CIPH_CTR_MODE)
             dat->stream.ctr = (ctr128_f) AES_ctr32_encrypt;
@@ -3408,8 +3328,7 @@ static int aes_xts_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                 (void)0;        /* terminate potentially open 'else' */
 
             if (enc) {
-                AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 4,
-                                    &xctx->ks1.ks);
+                AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 4, &xctx->ks1.ks);
                 xctx->xts.block1 = (block128_f) AES_encrypt;
             } else {
                 AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 4,
@@ -3433,8 +3352,7 @@ static int aes_xts_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
     return 1;
 }
 
-static int aes_xts_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out,
-                          const unsigned char *in, size_t len)
+static int aes_xts_cipher(EVP_CIPHER_CTX *ctx, unsigned char *out, const unsigned char *in, size_t len)
 {
     EVP_AES_XTS_CTX *xctx = EVP_C_DATA(EVP_AES_XTS_CTX,ctx);
 
@@ -4056,10 +3974,8 @@ static int aes_ocb_init_key(EVP_CIPHER_CTX *ctx, const unsigned char *key,
                 break;
             }
 # endif
-            AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                &octx->ksenc.ks);
-            AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8,
-                                &octx->ksdec.ks);
+            AES_set_encrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &octx->ksenc.ks);
+            AES_set_decrypt_key(key, EVP_CIPHER_CTX_key_length(ctx) * 8, &octx->ksdec.ks);
             if (!CRYPTO_ocb128_init(&octx->ocb,
                                     &octx->ksenc.ks, &octx->ksdec.ks,
                                     (block128_f) AES_encrypt,

@@ -243,8 +243,8 @@
 
 # define SSL_MD5                 0x00000001U
 # define SSL_SHA1                0x00000002U
-# define SSL_GOST94      0x00000004U
-# define SSL_GOST89MAC   0x00000008U
+# define SSL_GOST94      		 0x00000004U
+# define SSL_GOST89MAC   		 0x00000008U
 # define SSL_SHA256              0x00000010U
 # define SSL_SHA384              0x00000020U
 /* Not a real MAC, just an indication it is part of cipher */
@@ -450,17 +450,13 @@ struct ssl_method_st {
     int (*ssl_shutdown) (SSL *s);
     int (*ssl_renegotiate) (SSL *s);
     int (*ssl_renegotiate_check) (SSL *s, int);
-    int (*ssl_read_bytes) (SSL *s, int type, int *recvd_type,
-                           unsigned char *buf, size_t len, int peek,
-                           size_t *readbytes);
-    int (*ssl_write_bytes) (SSL *s, int type, const void *buf_, size_t len,
-                            size_t *written);
+    int (*ssl_read_bytes) (SSL *s, int type, int *recvd_type, unsigned char *buf, size_t len, int peek, size_t *readbytes);
+    int (*ssl_write_bytes) (SSL *s, int type, const void *buf_, size_t len, size_t *written);
     int (*ssl_dispatch_alert) (SSL *s);
     long (*ssl_ctrl) (SSL *s, int cmd, long larg, void *parg);
     long (*ssl_ctx_ctrl) (SSL_CTX *ctx, int cmd, long larg, void *parg);
     const SSL_CIPHER *(*get_cipher_by_char) (const unsigned char *ptr);
-    int (*put_cipher_by_char) (const SSL_CIPHER *cipher, WPACKET *pkt,
-                               size_t *len);
+    int (*put_cipher_by_char) (const SSL_CIPHER *cipher, WPACKET *pkt, size_t *len);
     size_t (*ssl_pending) (const SSL *s);
     int (*num_ciphers) (void);
     const SSL_CIPHER *(*get_cipher) (unsigned ncipher);
@@ -1128,8 +1124,7 @@ struct ssl_st {
     struct ssl3_state_st *s3;   /* SSLv3 variables */
     struct dtls1_state_st *d1;  /* DTLSv1 variables */
     /* callback that allows applications to peek at protocol messages */
-    void (*msg_callback) (int write_p, int version, int content_type,
-                          const void *buf, size_t len, SSL *ssl, void *arg);
+    void (*msg_callback) (int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg);
     void *msg_callback_arg;
     int hit;                    /* reusing a previous session */
     X509_VERIFY_PARAM *param;
@@ -1916,8 +1911,7 @@ typedef struct cert_st {
     /* Custom extensions */
     custom_ext_methods custext;
     /* Security callback */
-    int (*sec_cb) (const SSL *s, const SSL_CTX *ctx, int op, int bits, int nid,
-                   void *other, void *ex);
+    int (*sec_cb) (const SSL *s, const SSL_CTX *ctx, int op, int bits, int nid, void *other, void *ex);
     /* Security level */
     int sec_level;
     void *sec_ex;
@@ -1939,8 +1933,7 @@ typedef struct ssl3_enc_method {
     int (*enc) (SSL *, SSL3_RECORD *, size_t, int);
     int (*mac) (SSL *, SSL3_RECORD *, unsigned char *, int);
     int (*setup_key_block) (SSL *);
-    int (*generate_master_secret) (SSL *, unsigned char *, unsigned char *,
-                                   size_t, size_t *);
+    int (*generate_master_secret) (SSL *, unsigned char *, unsigned char *, size_t, size_t *);
     int (*change_cipher_state) (SSL *, int);
     size_t (*final_finish_mac) (SSL *, const char *, size_t, unsigned char *);
     const char *client_finished_label;
@@ -1948,10 +1941,7 @@ typedef struct ssl3_enc_method {
     const char *server_finished_label;
     size_t server_finished_label_len;
     int (*alert_value) (int);
-    int (*export_keying_material) (SSL *, unsigned char *, size_t,
-                                   const char *, size_t,
-                                   const unsigned char *, size_t,
-                                   int use_context);
+    int (*export_keying_material) (SSL *, unsigned char *, size_t, const char *, size_t, const unsigned char *, size_t, int use_context);
     /* Various flags indicating protocol version requirements */
     uint32_t enc_flags;
     /* Set the handshake header */
@@ -2099,8 +2089,7 @@ extern const SSL3_ENC_METHOD DTLSv1_2_enc_data;
 # define SSL_METHOD_NO_FIPS      (1U<<0)
 # define SSL_METHOD_NO_SUITEB    (1U<<1)
 
-# define IMPLEMENT_tls_meth_func(version, flags, mask, func_name, s_accept, \
-                                 s_connect, enc_data) \
+# define IMPLEMENT_tls_meth_func(version, flags, mask, func_name, s_accept, s_connect, enc_data) \
 const SSL_METHOD *func_name(void)  \
         { \
         static const SSL_METHOD func_name##_data= { \
@@ -2174,8 +2163,7 @@ const SSL_METHOD *func_name(void)  \
         return &func_name##_data; \
         }
 
-# define IMPLEMENT_dtls1_meth_func(version, flags, mask, func_name, s_accept, \
-                                        s_connect, enc_data) \
+# define IMPLEMENT_dtls1_meth_func(version, flags, mask, func_name, s_accept, s_connect, enc_data) \
 const SSL_METHOD *func_name(void)  \
         { \
         static const SSL_METHOD func_name##_data= { \
@@ -2253,14 +2241,8 @@ __owur int ssl_get_prev_session(SSL *s, CLIENTHELLO_MSG *hello);
 __owur SSL_SESSION *ssl_session_dup(SSL_SESSION *src, int ticket);
 __owur int ssl_cipher_id_cmp(const SSL_CIPHER *a, const SSL_CIPHER *b);
 DECLARE_OBJ_BSEARCH_GLOBAL_CMP_FN(SSL_CIPHER, SSL_CIPHER, ssl_cipher_id);
-__owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap,
-                                 const SSL_CIPHER *const *bp);
-__owur STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method,
-                                                    STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
-                                                    STACK_OF(SSL_CIPHER) **cipher_list,
-                                                    STACK_OF(SSL_CIPHER) **cipher_list_by_id,
-                                                    const char *rule_str,
-                                                    CERT *c);
+__owur int ssl_cipher_ptr_id_cmp(const SSL_CIPHER *const *ap, const SSL_CIPHER *const *bp);
+__owur STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(const SSL_METHOD *ssl_method, STACK_OF(SSL_CIPHER) *tls13_ciphersuites, STACK_OF(SSL_CIPHER) **cipher_list, STACK_OF(SSL_CIPHER) **cipher_list_by_id, const char *rule_str, CERT *c);
 __owur int ssl_cache_cipherlist(SSL *s, PACKET *cipher_suites, int sslv2format);
 __owur int bytes_to_cipher_list(SSL *s, PACKET *cipher_suites,
                                 STACK_OF(SSL_CIPHER) **skp,
@@ -2292,8 +2274,7 @@ __owur int ssl_cert_set_cert_store(CERT *c, X509_STORE *store, int chain,
                                    int ref);
 
 __owur int ssl_security(const SSL *s, int op, int bits, int nid, void *other);
-__owur int ssl_ctx_security(const SSL_CTX *ctx, int op, int bits, int nid,
-                            void *other);
+__owur int ssl_ctx_security(const SSL_CTX *ctx, int op, int bits, int nid, void *other);
 
 __owur int ssl_cert_lookup_by_nid(int nid, size_t *pidx);
 __owur const SSL_CERT_LOOKUP *ssl_cert_lookup_by_pkey(const EVP_PKEY *pk,

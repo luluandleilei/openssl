@@ -566,8 +566,7 @@ static void print_leak(const MEM *m, MEM_LEAK *l)
 
 IMPLEMENT_LHASH_DOALL_ARG_CONST(MEM, MEM_LEAK);
 
-int CRYPTO_mem_leaks_cb(int (*cb) (const char *str, size_t len, void *u),
-                        void *u)
+int CRYPTO_mem_leaks_cb(int (*cb) (const char *str, size_t len, void *u), void *u)
 {
     MEM_LEAK ml;
 

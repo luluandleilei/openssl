@@ -29,6 +29,7 @@ struct X509_name_entry_st {
 
 /* Name from RFC 5280. */
 struct X509_name_st {
+	//包括多个X509_NAME_ENTRY结构体,每个结构体包括对象和值（object 和value）。对象的类型包括国家、通用名、单位、组织、地区、邮件等
     STACK_OF(X509_NAME_ENTRY) *entries; /* DN components */
     int modified;               /* true if 'bytes' needs to be built */
     BUF_MEM *bytes;             /* cached encoding: cannot be NULL */

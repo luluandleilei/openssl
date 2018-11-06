@@ -180,8 +180,7 @@ static pthread_once_t fork_once_control = PTHREAD_ONCE_INIT;
 
 static void fork_once_func(void)
 {
-    pthread_atfork(OPENSSL_fork_prepare,
-                   OPENSSL_fork_parent, OPENSSL_fork_child);
+    pthread_atfork(OPENSSL_fork_prepare, OPENSSL_fork_parent, OPENSSL_fork_child);
 }
 # endif
 

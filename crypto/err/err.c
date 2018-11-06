@@ -270,8 +270,7 @@ DEFINE_RUN_ONCE_STATIC(do_err_strings_init)
     err_string_lock = CRYPTO_THREAD_lock_new();
     if (err_string_lock == NULL)
         return 0;
-    int_error_hash = lh_ERR_STRING_DATA_new(err_string_data_hash,
-                                            err_string_data_cmp);
+    int_error_hash = lh_ERR_STRING_DATA_new(err_string_data_hash, err_string_data_cmp);
     if (int_error_hash == NULL) {
         CRYPTO_THREAD_lock_free(err_string_lock);
         err_string_lock = NULL;
@@ -308,8 +307,7 @@ static int err_load_strings(const ERR_STRING_DATA *str)
 {
     CRYPTO_THREAD_write_lock(err_string_lock);
     for (; str->error; str++)
-        (void)lh_ERR_STRING_DATA_insert(int_error_hash,
-                                       (ERR_STRING_DATA *)str);
+        (void)lh_ERR_STRING_DATA_insert(int_error_hash, (ERR_STRING_DATA *)str);
     CRYPTO_THREAD_unlock(err_string_lock);
     return 1;
 }

@@ -121,8 +121,7 @@ static int rsa_pub_cmp(const EVP_PKEY *a, const EVP_PKEY *b)
     return 1;
 }
 
-static int old_rsa_priv_decode(EVP_PKEY *pkey,
-                               const unsigned char **pder, int derlen)
+static int old_rsa_priv_decode(EVP_PKEY *pkey, const unsigned char **pder, int derlen)
 {
     RSA *rsa;
 

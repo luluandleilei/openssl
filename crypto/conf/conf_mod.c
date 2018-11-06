@@ -224,8 +224,7 @@ static CONF_MODULE *module_load_dso(const CONF *cnf,
 }
 
 /* add module to list */
-static CONF_MODULE *module_add(DSO *dso, const char *name,
-                               conf_init_func *ifunc, conf_finish_func *ffunc)
+static CONF_MODULE *module_add(DSO *dso, const char *name, conf_init_func *ifunc, conf_finish_func *ffunc)
 {
     CONF_MODULE *tmod = NULL;
     if (supported_modules == NULL)
@@ -411,8 +410,7 @@ static void module_finish(CONF_IMODULE *imod)
 
 /* Add a static module to OpenSSL */
 
-int CONF_module_add(const char *name, conf_init_func *ifunc,
-                    conf_finish_func *ffunc)
+int CONF_module_add(const char *name, conf_init_func *ifunc, conf_finish_func *ffunc)
 {
     if (module_add(NULL, name, ifunc, ffunc))
         return 1;
@@ -507,9 +505,7 @@ char *CONF_get1_default_config_file(void)
  * lists for example.
  */
 
-int CONF_parse_list(const char *list_, int sep, int nospc,
-                    int (*list_cb) (const char *elem, int len, void *usr),
-                    void *arg)
+int CONF_parse_list(const char *list_, int sep, int nospc, int (*list_cb) (const char *elem, int len, void *usr), void *arg)
 {
     int ret;
     const char *lstart, *tmpend, *p;

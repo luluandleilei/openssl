@@ -79,6 +79,7 @@ X509_PUBKEY *X509_REQ_get_X509_PUBKEY(X509_REQ *req)
     return req->req_info.pubkey;
 }
 
+//Checks the consistency of private key k with the public key in certificate request x
 int X509_REQ_check_private_key(X509_REQ *x, EVP_PKEY *k)
 {
     EVP_PKEY *xk = NULL;

@@ -16,14 +16,12 @@
 #  endif
 # endif
 
-# if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L \
-     && !defined(__STDC_NO_ATOMICS__)
+# if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
 #  include <stdatomic.h>
 #  define HAVE_C11_ATOMICS
 # endif
 
-# if defined(HAVE_C11_ATOMICS) && defined(ATOMIC_INT_LOCK_FREE) \
-     && ATOMIC_INT_LOCK_FREE > 0
+# if defined(HAVE_C11_ATOMICS) && defined(ATOMIC_INT_LOCK_FREE) && ATOMIC_INT_LOCK_FREE > 0
 
 #  define HAVE_ATOMICS 1
 

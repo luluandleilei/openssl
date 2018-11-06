@@ -29,8 +29,7 @@ static int parse_bag(PKCS12_SAFEBAG *bag, const char *pass, int passlen,
  * uninitialised.
  */
 
-int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
-                 STACK_OF(X509) **ca)
+int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, STACK_OF(X509) **ca)
 {
     STACK_OF(X509) *ocerts = NULL;
     X509 *x = NULL;
@@ -43,8 +42,7 @@ int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert,
     /* Check for NULL PKCS12 structure */
 
     if (!p12) {
-        PKCS12err(PKCS12_F_PKCS12_PARSE,
-                  PKCS12_R_INVALID_NULL_PKCS12_POINTER);
+        PKCS12err(PKCS12_F_PKCS12_PARSE, PKCS12_R_INVALID_NULL_PKCS12_POINTER);
         return 0;
     }
 
