@@ -169,6 +169,8 @@
 #  else
 #   define bn_pollute(a)
 #  endif
+//bn_check_top() verifies that ((a)->top >= 0 && (a)->top <= (a)->dmax). 
+//A violation will cause the program to abort.
 #  define bn_check_top(a) \
         do { \
                 const BIGNUM *_bnum2 = (a); \
@@ -204,13 +206,32 @@
 
 # endif
 
+//bn_mul_add_words(rp, ap, num, w) operates on the num word arrays rp and ap. 
+//It computes ap * w + rp, places the result in rp, and returns the high word (carry).
 BN_ULONG bn_mul_add_words(BN_ULONG *rp, const BN_ULONG *ap, int num, BN_ULONG w);
+//bn_mul_words(rp, ap, num, w) operates on the num word arrays rp and ap. 
+//It computes ap * w, places the result in rp, and returns the high word (carry).
 BN_ULONG bn_mul_words(BN_ULONG *rp, const BN_ULONG *ap, int num, BN_ULONG w);
+//bn_sqr_words(rp, ap, n) operates on the num word array ap and the 2*num word array ap. 
+//It computes ap * ap word-wise, and places the low and high bytes of the result in rp.
 void bn_sqr_words(BN_ULONG *rp, const BN_ULONG *ap, int num);
+//bn_div_words(h, l, d) divides the two word number (h,l) by d and returns the result.
 BN_ULONG bn_div_words(BN_ULONG h, BN_ULONG l, BN_ULONG d);
+//bn_add_words(rp, ap, bp, num) operates on the num word arrays ap, bp and rp. 
+//It computes ap + bp, places the result in rp, and returns the high word (carry).
 BN_ULONG bn_add_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp, int num);
+//bn_sub_words(rp, ap, bp, num) operates on the num word arrays ap, bp and rp. 
+//It computes ap - bp, places the result in rp, and returns the carry (1 if bp > ap, 0 otherwise).
 BN_ULONG bn_sub_words(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp, int num);
 
+//The integer value is stored in 'd', a malloc()ed array of words (BN_ULONG), least significant word first. 
+//A BN_ULONG can be either 16, 32 or 64 bits in size, depending on the 'number of bits' (BITS2) specified in openssl/bn.h.
+//'dmax' is the size of the 'd' array that has been allocated. 
+//'top' is the number of words being used, so for a value of 4, bn.d[0]=4 and bn.top=1. 
+//'neg' is 1 if the number is negative. 
+//When a BIGNUM is 0, the d field can be NULL and top == 0.
+//'flags' is a bit field of flags which are defined in openssl/bn.h. The flags begin with BN_FLG_. 
+//The macros BN_set_flags(b,n) and BN_get_flags(b,n) exist to enable or fetch flag(s) 'n' from BIGNUM structure 'b'.
 struct bignum_st {
     BN_ULONG *d;                /* Pointer to an array of 'BN_BITS2' bit chunks. */
     int top;                    /* Index of last used d +1. */
@@ -621,32 +642,30 @@ void BN_MONT_CTX_init(BN_MONT_CTX *ctx);
 
 void bn_init(BIGNUM *a);
 void bn_mul_normal(BN_ULONG *r, BN_ULONG *a, int na, BN_ULONG *b, int nb);
+//bn_mul_comba8(r, a, b) operates on the 8 word arrays a and b and the 16 word array r. 
+//It computes a*b and places the result in r.
 void bn_mul_comba8(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b);
+//bn_mul_comba4(r, a, b) operates on the 4 word arrays a and b and the 8 word array r. 
+//It computes a*b and places the result in r.
 void bn_mul_comba4(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b);
 void bn_sqr_normal(BN_ULONG *r, const BN_ULONG *a, int n, BN_ULONG *tmp);
+//bn_sqr_comba8(r, a, b) operates on the 8 word arrays a and b and the 16 word array r.
 void bn_sqr_comba8(BN_ULONG *r, const BN_ULONG *a);
+//bn_sqr_comba4(r, a, b) operates on the 4 word arrays a and b and the 8 word array r.
 void bn_sqr_comba4(BN_ULONG *r, const BN_ULONG *a);
 int bn_cmp_words(const BN_ULONG *a, const BN_ULONG *b, int n);
 int bn_cmp_part_words(const BN_ULONG *a, const BN_ULONG *b, int cl, int dl);
-void bn_mul_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
-                      int dna, int dnb, BN_ULONG *t);
-void bn_mul_part_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b,
-                           int n, int tna, int tnb, BN_ULONG *t);
+void bn_mul_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2, int dna, int dnb, BN_ULONG *t);
+void bn_mul_part_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n, int tna, int tnb, BN_ULONG *t);
 void bn_sqr_recursive(BN_ULONG *r, const BN_ULONG *a, int n2, BN_ULONG *t);
 void bn_mul_low_normal(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n);
-void bn_mul_low_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
-                          BN_ULONG *t);
-BN_ULONG bn_sub_part_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b,
-                           int cl, int dl);
-int bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp,
-                const BN_ULONG *np, const BN_ULONG *n0, int num);
+void bn_mul_low_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2, BN_ULONG *t);
+BN_ULONG bn_sub_part_words(BN_ULONG *r, const BN_ULONG *a, const BN_ULONG *b, int cl, int dl);
+int bn_mul_mont(BN_ULONG *rp, const BN_ULONG *ap, const BN_ULONG *bp, const BN_ULONG *np, const BN_ULONG *n0, int num);
 
-BIGNUM *int_bn_mod_inverse(BIGNUM *in,
-                           const BIGNUM *a, const BIGNUM *n, BN_CTX *ctx,
-                           int *noinv);
+BIGNUM *int_bn_mod_inverse(BIGNUM *in, const BIGNUM *a, const BIGNUM *n, BN_CTX *ctx, int *noinv);
 
-int bn_probable_prime_dh(BIGNUM *rnd, int bits,
-                         const BIGNUM *add, const BIGNUM *rem, BN_CTX *ctx);
+int bn_probable_prime_dh(BIGNUM *rnd, int bits, const BIGNUM *add, const BIGNUM *rem, BN_CTX *ctx);
 
 static ossl_inline BIGNUM *bn_expand(BIGNUM *a, int bits)
 {

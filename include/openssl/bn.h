@@ -29,7 +29,7 @@ extern "C" {
  */
 # ifdef SIXTY_FOUR_BIT_LONG
 #  define BN_ULONG        unsigned long
-#  define BN_BYTES        8
+#  define BN_BYTES        8					//BN_BYTES -- BN_ULONG占用的字节数, 
 # endif
 
 /*
@@ -37,15 +37,15 @@ extern "C" {
  */
 # ifdef SIXTY_FOUR_BIT
 #  define BN_ULONG        unsigned long long
-#  define BN_BYTES        8
+#  define BN_BYTES        8					//BN_BYTES -- BN_ULONG占用的字节数, 
 # endif
 
 # ifdef THIRTY_TWO_BIT
 #  define BN_ULONG        unsigned int
-#  define BN_BYTES        4
+#  define BN_BYTES        4					//BN_BYTES -- BN_ULONG占用的字节数, 
 # endif
 
-# define BN_BITS2       (BN_BYTES * 8)
+# define BN_BITS2       (BN_BYTES * 8)	//BN_BITS2 -- BN_ULONG占用的位数
 # define BN_BITS        (BN_BITS2 * 2)
 # define BN_TBIT        ((BN_ULONG)1 << (BN_BITS2 - 1))
 
@@ -176,6 +176,7 @@ void *BN_GENCB_get_arg(BN_GENCB *cb);
                                 (b) >=  55  ? 27 : \
                                 /* b >= 6 */ 34)
 
+//Returns the size of a BIGNUM in bytes.
 # define BN_num_bytes(a) ((BN_num_bits(a)+7)/8)
 
 int BN_abs_is_word(const BIGNUM *a, const BN_ULONG w);

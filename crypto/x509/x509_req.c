@@ -79,7 +79,7 @@ X509_PUBKEY *X509_REQ_get_X509_PUBKEY(X509_REQ *req)
     return req->req_info.pubkey;
 }
 
-//Checks the consistency of private key k with the public key in certificate request x
+//Checks the consistency of private key 'k' with the public key in certificate request 'x'
 int X509_REQ_check_private_key(X509_REQ *x, EVP_PKEY *k)
 {
     EVP_PKEY *xk = NULL;
@@ -91,8 +91,7 @@ int X509_REQ_check_private_key(X509_REQ *x, EVP_PKEY *k)
         ok = 1;
         break;
     case 0:
-        X509err(X509_F_X509_REQ_CHECK_PRIVATE_KEY,
-                X509_R_KEY_VALUES_MISMATCH);
+        X509err(X509_F_X509_REQ_CHECK_PRIVATE_KEY, X509_R_KEY_VALUES_MISMATCH);
         break;
     case -1:
         X509err(X509_F_X509_REQ_CHECK_PRIVATE_KEY, X509_R_KEY_TYPE_MISMATCH);
@@ -107,8 +106,7 @@ int X509_REQ_check_private_key(X509_REQ *x, EVP_PKEY *k)
 #ifndef OPENSSL_NO_DH
         if (EVP_PKEY_id(k) == EVP_PKEY_DH) {
             /* No idea */
-            X509err(X509_F_X509_REQ_CHECK_PRIVATE_KEY,
-                    X509_R_CANT_CHECK_DH_KEY);
+            X509err(X509_F_X509_REQ_CHECK_PRIVATE_KEY, X509_R_CANT_CHECK_DH_KEY);
             break;
         }
 #endif

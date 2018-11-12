@@ -37,6 +37,7 @@ struct evp_pkey_asn1_method_st {
     int (*pkey_size) (const EVP_PKEY *pk);
 	//returns the key size in bits. It's called by EVP_PKEY_bits.
     int (*pkey_bits) (const EVP_PKEY *pk);
+	//Returns the security key size in bits. It's called by EVP_PKEY_bits.
     int (*pkey_security_bits) (const EVP_PKEY *pk);
 	//Decode DER formatted parameters to pkey. It MUST return 0 on error, 1 on success. It's called by PEM_read_bio_Parameters.
     int (*param_decode) (EVP_PKEY *pkey, const unsigned char **pder, int derlen);
@@ -44,7 +45,7 @@ struct evp_pkey_asn1_method_st {
     int (*param_encode) (const EVP_PKEY *pkey, unsigned char **pder);
 	//Returns 0 if a key parameter is missing, otherwise 1. It's called by EVP_PKEY_missing_parameters.
     int (*param_missing) (const EVP_PKEY *pk);
-	//Copies key parameters from from to to. It MUST return 0 on error, 1 on success. It's called by EVP_PKEY_copy_parameters.
+	//Copies key parameters from 'from' to 'to'. It MUST return 0 on error, 1 on success. It's called by EVP_PKEY_copy_parameters.
     int (*param_copy) (EVP_PKEY *to, const EVP_PKEY *from);
 	//Compares the parameters of keys a and b. It MUST return 1 when the keys are equal, 0 when not equal, or a negative number on error. It's called by EVP_PKEY_cmp_parameters.
     int (*param_cmp) (const EVP_PKEY *a, const EVP_PKEY *b);

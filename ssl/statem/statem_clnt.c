@@ -413,9 +413,7 @@ static WRITE_TRAN ossl_statem_client13_write_transition(SSL *s)
     switch (st->hand_state) {
     default:
         /* Shouldn't happen */
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR,
-                 SSL_F_OSSL_STATEM_CLIENT13_WRITE_TRANSITION,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_OSSL_STATEM_CLIENT13_WRITE_TRANSITION, ERR_R_INTERNAL_ERROR);
         return WRITE_TRAN_ERROR;
 
     case TLS_ST_CR_CERT_REQ:
@@ -429,9 +427,7 @@ static WRITE_TRAN ossl_statem_client13_write_transition(SSL *s)
          */
         if (!ossl_assert((s->shutdown & SSL_SENT_SHUTDOWN) != 0)) {
             /* Shouldn't happen - same as default case */
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR,
-                     SSL_F_OSSL_STATEM_CLIENT13_WRITE_TRANSITION,
-                     ERR_R_INTERNAL_ERROR);
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_OSSL_STATEM_CLIENT13_WRITE_TRANSITION, ERR_R_INTERNAL_ERROR);
             return WRITE_TRAN_ERROR;
         }
         st->hand_state = TLS_ST_OK;
@@ -441,12 +437,10 @@ static WRITE_TRAN ossl_statem_client13_write_transition(SSL *s)
         if (s->early_data_state == SSL_EARLY_DATA_WRITE_RETRY
                 || s->early_data_state == SSL_EARLY_DATA_FINISHED_WRITING)
             st->hand_state = TLS_ST_PENDING_EARLY_DATA_END;
-        else if ((s->options & SSL_OP_ENABLE_MIDDLEBOX_COMPAT) != 0
-                 && s->hello_retry_request == SSL_HRR_NONE)
+        else if ((s->options & SSL_OP_ENABLE_MIDDLEBOX_COMPAT) != 0 && s->hello_retry_request == SSL_HRR_NONE)
             st->hand_state = TLS_ST_CW_CHANGE;
         else
-            st->hand_state = (s->s3->tmp.cert_req != 0) ? TLS_ST_CW_CERT
-                                                        : TLS_ST_CW_FINISHED;
+            st->hand_state = (s->s3->tmp.cert_req != 0) ? TLS_ST_CW_CERT : TLS_ST_CW_FINISHED;
         return WRITE_TRAN_CONTINUE;
 
     case TLS_ST_PENDING_EARLY_DATA_END:
@@ -888,8 +882,7 @@ WORK_STATE ossl_statem_client_post_work(SSL *s, WORK_STATE wst)
  *   1: Success
  *   0: Error
  */
-int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt,
-                                         confunc_f *confunc, int *mt)
+int ossl_statem_client_construct_message(SSL *s, WPACKET *pkt, confunc_f *confunc, int *mt)
 {
     OSSL_STATEM *st = &s->statem;
 
@@ -1157,10 +1150,8 @@ int tls_construct_client_hello(SSL *s, WPACKET *pkt)
         i = (s->hello_retry_request == SSL_HRR_NONE);
     }
 
-    if (i && ssl_fill_hello_random(s, 0, p, sizeof(s->s3->client_random),
-                                   DOWNGRADE_NONE) <= 0) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+    if (i && ssl_fill_hello_random(s, 0, p, sizeof(s->s3->client_random), DOWNGRADE_NONE) <= 0) {
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 
@@ -1231,29 +1222,24 @@ int tls_construct_client_hello(SSL *s, WPACKET *pkt)
         }
     }
     if (!WPACKET_start_sub_packet_u8(pkt)
-            || (sess_id_len != 0 && !WPACKET_memcpy(pkt, session_id,
-                                                    sess_id_len))
+            || (sess_id_len != 0 && !WPACKET_memcpy(pkt, session_id, sess_id_len))
             || !WPACKET_close(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 
     /* cookie stuff for DTLS */
     if (SSL_IS_DTLS(s)) {
         if (s->d1->cookie_len > sizeof(s->d1->cookie)
-                || !WPACKET_sub_memcpy_u8(pkt, s->d1->cookie,
-                                          s->d1->cookie_len)) {
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                     ERR_R_INTERNAL_ERROR);
+                || !WPACKET_sub_memcpy_u8(pkt, s->d1->cookie, s->d1->cookie_len)) {
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
             return 0;
         }
     }
 
     /* Ciphers supported */
     if (!WPACKET_start_sub_packet_u16(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 
@@ -1262,15 +1248,13 @@ int tls_construct_client_hello(SSL *s, WPACKET *pkt)
         return 0;
     }
     if (!WPACKET_close(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 
     /* COMPRESSION */
     if (!WPACKET_start_sub_packet_u8(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 #ifndef OPENSSL_NO_COMP
@@ -1291,8 +1275,7 @@ int tls_construct_client_hello(SSL *s, WPACKET *pkt)
 #endif
     /* Add the NULL method */
     if (!WPACKET_put_bytes_u8(pkt, 0) || !WPACKET_close(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CLIENT_HELLO, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 

@@ -1833,13 +1833,8 @@ int s_client_main(int argc, char **argv)
     }
 
     for (i = 0; i < serverinfo_count; i++) {
-        if (!SSL_CTX_add_client_custom_ext(ctx,
-                                           serverinfo_types[i],
-                                           NULL, NULL, NULL,
-                                           serverinfo_cli_parse_cb, NULL)) {
-            BIO_printf(bio_err,
-                       "Warning: Unable to add custom extension %u, skipping\n",
-                       serverinfo_types[i]);
+        if (!SSL_CTX_add_client_custom_ext(ctx, serverinfo_types[i], NULL, NULL, NULL, serverinfo_cli_parse_cb, NULL)) {
+            BIO_printf(bio_err, "Warning: Unable to add custom extension %u, skipping\n", serverinfo_types[i]);
         }
     }
 

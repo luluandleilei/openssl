@@ -3275,8 +3275,7 @@ int ssl3_set_handshake_header(SSL *s, WPACKET *pkt, int htype)
         return 1;
 
     /* Set the content type and 3 bytes for the message len */
-    if (!WPACKET_put_bytes_u8(pkt, htype)
-            || !WPACKET_start_sub_packet_u24(pkt))
+    if (!WPACKET_put_bytes_u8(pkt, htype) || !WPACKET_start_sub_packet_u24(pkt))
         return 0;
 
     return 1;
@@ -3457,9 +3456,7 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
             nid = EC_GROUP_get_curve_name(group);
             if (nid == NID_undef)
                 return 0;
-            return tls1_set_groups(&s->ext.supportedgroups,
-                                   &s->ext.supportedgroups_len,
-                                   &nid, 1);
+            return tls1_set_groups(&s->ext.supportedgroups, &s->ext.supportedgroups_len, &nid, 1);
         }
         break;
 #endif                          /* !OPENSSL_NO_EC */
@@ -4448,9 +4445,7 @@ static int ssl3_read_internal(SSL *s, void *buf, size_t len, int peek,
     if (s->s3->renegotiate)
         ssl3_renegotiate_check(s, 0);
     s->s3->in_read_app_data = 1;
-    ret =
-        s->method->ssl_read_bytes(s, SSL3_RT_APPLICATION_DATA, NULL, buf, len,
-                                  peek, readbytes);
+    ret = s->method->ssl_read_bytes(s, SSL3_RT_APPLICATION_DATA, NULL, buf, len, peek, readbytes);
     if ((ret == -1) && (s->s3->in_read_app_data == 2)) {
         /*
          * ssl3_read_bytes decided to call s->handshake_func, which called
@@ -4708,8 +4703,7 @@ EVP_PKEY *ssl_generate_pkey_group(SSL *s, uint16_t id)
         goto err;
     }
     if (EVP_PKEY_keygen(pctx, &pkey) <= 0) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_SSL_GENERATE_PKEY_GROUP,
-                 ERR_R_EVP_LIB);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_SSL_GENERATE_PKEY_GROUP, ERR_R_EVP_LIB);
         EVP_PKEY_free(pkey);
         pkey = NULL;
     }

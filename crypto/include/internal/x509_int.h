@@ -157,10 +157,10 @@ struct x509_cinf_st {
 };
 
 struct x509_st {
-    X509_CINF cert_info;
-    X509_ALGOR sig_alg;
-    ASN1_BIT_STRING signature;
-    X509_SIG_INFO siginf;
+    X509_CINF cert_info;		//Certificate
+    X509_ALGOR sig_alg;			//Certificate Signature Algorithm
+    ASN1_BIT_STRING signature;	//Certificate Signature
+    X509_SIG_INFO siginf;		
     CRYPTO_REF_COUNT references;
     CRYPTO_EX_DATA ex_data;
     /* These contain copies of various extension values */

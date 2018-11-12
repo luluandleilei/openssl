@@ -69,8 +69,7 @@ static EVP_PKEY *openssl_load_privkey(ENGINE *eng, const char *key_id,
 
 #ifdef TEST_ENG_OPENSSL_HMAC
 static int ossl_register_hmac_meth(void);
-static int ossl_pkey_meths(ENGINE *e, EVP_PKEY_METHOD **pmeth,
-                           const int **nids, int nid);
+static int ossl_pkey_meths(ENGINE *e, EVP_PKEY_METHOD **pmeth, const int **nids, int nid);
 #endif
 
 /* The constants used when creating the ENGINE */
@@ -516,8 +515,7 @@ static int ossl_hmac_signctx_init(EVP_PKEY_CTX *ctx, EVP_MD_CTX *mctx)
     return 1;
 }
 
-static int ossl_hmac_signctx(EVP_PKEY_CTX *ctx, unsigned char *sig,
-                             size_t *siglen, EVP_MD_CTX *mctx)
+static int ossl_hmac_signctx(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *siglen, EVP_MD_CTX *mctx)
 {
     unsigned int hlen;
     OSSL_HMAC_PKEY_CTX *hctx = EVP_PKEY_CTX_get_data(ctx);
@@ -567,8 +565,7 @@ static int ossl_hmac_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
     return 1;
 }
 
-static int ossl_hmac_ctrl_str(EVP_PKEY_CTX *ctx,
-                              const char *type, const char *value)
+static int ossl_hmac_ctrl_str(EVP_PKEY_CTX *ctx, const char *type, const char *value)
 {
     if (!value) {
         return 0;
@@ -605,16 +602,14 @@ static int ossl_register_hmac_meth(void)
 
     EVP_PKEY_meth_set_keygen(meth, 0, ossl_hmac_keygen);
 
-    EVP_PKEY_meth_set_signctx(meth, ossl_hmac_signctx_init,
-                              ossl_hmac_signctx);
+    EVP_PKEY_meth_set_signctx(meth, ossl_hmac_signctx_init, ossl_hmac_signctx);
 
     EVP_PKEY_meth_set_ctrl(meth, ossl_hmac_ctrl, ossl_hmac_ctrl_str);
     ossl_hmac_meth = meth;
     return 1;
 }
 
-static int ossl_pkey_meths(ENGINE *e, EVP_PKEY_METHOD **pmeth,
-                           const int **nids, int nid)
+static int ossl_pkey_meths(ENGINE *e, EVP_PKEY_METHOD **pmeth, const int **nids, int nid)
 {
     static int ossl_pkey_nids[] = {
         EVP_PKEY_HMAC,

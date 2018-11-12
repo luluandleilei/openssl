@@ -3982,11 +3982,18 @@ SSL_CTX *SSL_set_SSL_CTX(SSL *ssl, SSL_CTX *ctx)
     return ssl->ctx;
 }
 
+//Specifies that the default locations from which CA certificates are loaded should be used. 
+//There is one default directory and one default file. 
+//The default CA certificates directory is called "certs" in the default OpenSSL directory.
+//Alternatively the SSL_CERT_DIR environment variable can be defined to override this location. 
+//The default CA certificates file is called "cert.pem" in the default OpenSSL directory. 
+//Alternatively the SSL_CERT_FILE environment variable can be defined to override this location.
 int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
 {
     return X509_STORE_set_default_paths(ctx->cert_store);
 }
 
+//Is similar to SSL_CTX_set_default_verify_paths() except that just the default directory is used.
 int SSL_CTX_set_default_verify_dir(SSL_CTX *ctx)
 {
     X509_LOOKUP *lookup;
@@ -4002,6 +4009,7 @@ int SSL_CTX_set_default_verify_dir(SSL_CTX *ctx)
     return 1;
 }
 
+//Is similar to SSL_CTX_set_default_verify_paths() except that just the default file is used.
 int SSL_CTX_set_default_verify_file(SSL_CTX *ctx)
 {
     X509_LOOKUP *lookup;
@@ -4018,8 +4026,24 @@ int SSL_CTX_set_default_verify_file(SSL_CTX *ctx)
     return 1;
 }
 
-int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile,
-                                  const char *CApath)
+//Specifies the locations for ctx, at which CA certificates for verification purposes are located. 
+//The certificates available via CAfile and CApath are trusted.
+//
+//If 'CAfile' is not NULL, it points to a file of CA certificates in PEM format. 
+//The file can contain several CA certificates identified by sequences:
+//		-----BEGIN CERTIFICATE-----
+//		... (CA certificate in base64 encoding) ...
+//		-----END CERTIFICATE-----
+//The 'CAfile' is processed on execution of the SSL_CTX_load_verify_locations() function.
+//
+//If CApath is not NULL, it points to a directory containing CA certificates in PEM format. 
+//The files each contain one CA certificate. The files are looked up by the CA subject name hash value, which must hence be available. If more than one CA certificate with the same name hash value exist, the extension must be different (e.g. 9d66eef0.0, 9d66eef0.1 etc). The search is performed in the ordering of the extension number, regardless of other properties of the certificates. Use the 'c_rehash' utility to create the necessary links.
+//The certificates in CApath are only looked up when required, e.g. when building the certificate chain or when actually performing the verification of a peer certificate.
+//
+//When looking up CA certificates, the OpenSSL library will first search the certificates in CAfile, then those in CApath. Certificate matching is done based on the subject name, the key identifier (if present), and the serial number as taken from the certificate to be verified. If these data do not match, the next certificate will be tried. If a first certificate matching the parameters is found, the verification process will be performed; no other certificates for the same parameters will be searched in case of failure.
+//
+//When building its own certificate chain, an OpenSSL client/server will try to fill in missing certificates from CAfile/CApath, if the certificate chain was not explicitly specified (see SSL_CTX_add_extra_chain_cert, SSL_CTX_use_certificate
+int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
 {
     return X509_STORE_load_locations(ctx->cert_store, CAfile, CApath);
 }
@@ -4143,15 +4167,17 @@ int SSL_want(const SSL *s)
  */
 
 #ifndef OPENSSL_NO_DH
-void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx,
-                                 DH *(*dh) (SSL *ssl, int is_export,
-                                            int keylength))
+//Sets the callback function for ctx to be used when a DH parameters are required to tmp_dh_callback. 
+//The callback is inherited by all ssl objects created from ctx.
+//This functions apply to SSL/TLS servers only.
+void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh) (SSL *ssl, int is_export, int keylength))
 {
     SSL_CTX_callback_ctrl(ctx, SSL_CTRL_SET_TMP_DH_CB, (void (*)(void))dh);
 }
 
-void SSL_set_tmp_dh_callback(SSL *ssl, DH *(*dh) (SSL *ssl, int is_export,
-                                                  int keylength))
+//Sets the callback only for ssl.
+//This functions apply to SSL/TLS servers only.
+void SSL_set_tmp_dh_callback(SSL *ssl, DH *(*dh) (SSL *ssl, int is_export, int keylength))
 {
     SSL_callback_ctrl(ssl, SSL_CTRL_SET_TMP_DH_CB, (void (*)(void))dh);
 }

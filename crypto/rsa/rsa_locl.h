@@ -67,14 +67,10 @@ struct rsa_st {
 
 struct rsa_meth_st {
     char *name;
-    int (*rsa_pub_enc) (int flen, const unsigned char *from,
-                        unsigned char *to, RSA *rsa, int padding);
-    int (*rsa_pub_dec) (int flen, const unsigned char *from,
-                        unsigned char *to, RSA *rsa, int padding);
-    int (*rsa_priv_enc) (int flen, const unsigned char *from,
-                         unsigned char *to, RSA *rsa, int padding);
-    int (*rsa_priv_dec) (int flen, const unsigned char *from,
-                         unsigned char *to, RSA *rsa, int padding);
+    int (*rsa_pub_enc) (int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding);
+    int (*rsa_pub_dec) (int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding);
+    int (*rsa_priv_enc) (int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding);
+    int (*rsa_priv_dec) (int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding);
     /* Can be null */
     int (*rsa_mod_exp) (BIGNUM *r0, const BIGNUM *I, RSA *rsa, BN_CTX *ctx);
     /* Can be null */

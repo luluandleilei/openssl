@@ -14,36 +14,37 @@
 #include <openssl/rand.h>
 #include "rsa_locl.h"
 
+//Returns the number of significant bits.
+//rsa and rsa->n must not be NULL.
 int RSA_bits(const RSA *r)
 {
     return BN_num_bits(r->n);
 }
 
+//Returns the RSA modulus size in bytes. 
+//It can be used to determine how much memory must be allocated for an RSA encrypted value.
+//rsa and rsa->n must not be NULL.
 int RSA_size(const RSA *r)
 {
     return BN_num_bytes(r->n);
 }
 
-int RSA_public_encrypt(int flen, const unsigned char *from, unsigned char *to,
-                       RSA *rsa, int padding)
+int RSA_public_encrypt(int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding)
 {
     return rsa->meth->rsa_pub_enc(flen, from, to, rsa, padding);
 }
 
-int RSA_private_encrypt(int flen, const unsigned char *from,
-                        unsigned char *to, RSA *rsa, int padding)
+int RSA_private_encrypt(int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding)
 {
     return rsa->meth->rsa_priv_enc(flen, from, to, rsa, padding);
 }
 
-int RSA_private_decrypt(int flen, const unsigned char *from,
-                        unsigned char *to, RSA *rsa, int padding)
+int RSA_private_decrypt(int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding)
 {
     return rsa->meth->rsa_priv_dec(flen, from, to, rsa, padding);
 }
 
-int RSA_public_decrypt(int flen, const unsigned char *from, unsigned char *to,
-                       RSA *rsa, int padding)
+int RSA_public_decrypt(int flen, const unsigned char *from, unsigned char *to, RSA *rsa, int padding)
 {
     return rsa->meth->rsa_pub_dec(flen, from, to, rsa, padding);
 }

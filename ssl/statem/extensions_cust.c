@@ -204,9 +204,7 @@ int custom_ext_add(SSL *s, int context, WPACKET *pkt, X509 *x, size_t chainidx,
             continue;
 
         if (meth->add_cb != NULL) {
-            int cb_retval = meth->add_cb(s, meth->ext_type, context, &out,
-                                         &outlen, x, chainidx, &al,
-                                         meth->add_arg);
+            int cb_retval = meth->add_cb(s, meth->ext_type, context, &out, &outlen, x, chainidx, &al, meth->add_arg);
 
             if (cb_retval < 0) {
                 SSLfatal(s, al, SSL_F_CUSTOM_EXT_ADD, SSL_R_CALLBACK_FAILED);
@@ -220,8 +218,7 @@ int custom_ext_add(SSL *s, int context, WPACKET *pkt, X509 *x, size_t chainidx,
                 || !WPACKET_start_sub_packet_u16(pkt)
                 || (outlen > 0 && !WPACKET_memcpy(pkt, out, outlen))
                 || !WPACKET_close(pkt)) {
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_CUSTOM_EXT_ADD,
-                     ERR_R_INTERNAL_ERROR);
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_CUSTOM_EXT_ADD, ERR_R_INTERNAL_ERROR);
             return 0;
         }
         if ((context & SSL_EXT_CLIENT_HELLO) != 0) {
@@ -229,8 +226,7 @@ int custom_ext_add(SSL *s, int context, WPACKET *pkt, X509 *x, size_t chainidx,
              * We can't send duplicates: code logic should prevent this.
              */
             if (!ossl_assert((meth->ext_flags & SSL_EXT_FLAG_SENT) == 0)) {
-                SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_CUSTOM_EXT_ADD,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_CUSTOM_EXT_ADD, ERR_R_INTERNAL_ERROR);
                 return 0;
             }
             /*

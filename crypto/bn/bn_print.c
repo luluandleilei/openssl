@@ -17,6 +17,9 @@
 static const char Hex[] = "0123456789ABCDEF";
 
 /* Must 'OPENSSL_free' the returned data */
+//Return printable strings containing the hexadecimal encoding of a respectively. 
+//For negative numbers, the string is prefaced with a leading '-'. 
+//The string must be freed later using OPENSSL_free().
 char *BN_bn2hex(const BIGNUM *a)
 {
     int i, j, v, z = 0;
@@ -50,6 +53,9 @@ char *BN_bn2hex(const BIGNUM *a)
 }
 
 /* Must 'OPENSSL_free' the returned data */
+//Return printable strings containing the decimal encoding of a respectively. 
+//For negative numbers, the string is prefaced with a leading '-'. 
+//The string must be freed later using OPENSSL_free().
 char *BN_bn2dec(const BIGNUM *a)
 {
     int i = 0, num, ok = 0, n, tbytes;
@@ -123,6 +129,10 @@ char *BN_bn2dec(const BIGNUM *a)
     return NULL;
 }
 
+//Takes as many characters as possible from the string 'a', including the leading character '-' which means negative, 
+//to form a valid hexadecimal number representation and converts them to a BIGNUM and stores it in **bn. 
+//If *bn is NULL, a new BIGNUM is created. If 'bn' is NULL, it only computes the length of valid representation. 
+//A "negative zero" is converted to zero.
 int BN_hex2bn(BIGNUM **bn, const char *a)
 {
     BIGNUM *ret = NULL;
@@ -196,6 +206,10 @@ int BN_hex2bn(BIGNUM **bn, const char *a)
     return 0;
 }
 
+//Takes as many characters as possible from the string 'a', including the leading character '-' which means negative, 
+//to form a valid decimal number representation and converts them to a BIGNUM and stores it in **bn. 
+//If *bn is NULL, a new BIGNUM is created. If 'bn' is NULL, it only computes the length of valid representation. 
+//A "negative zero" is converted to zero.
 int BN_dec2bn(BIGNUM **bn, const char *a)
 {
     BIGNUM *ret = NULL;
@@ -287,6 +301,7 @@ int BN_asc2bn(BIGNUM **bn, const char *a)
 }
 
 # ifndef OPENSSL_NO_STDIO
+//Write the hexadecimal encoding of a, with a leading '-' for negative numbers, to the FILE fp.
 int BN_print_fp(FILE *fp, const BIGNUM *a)
 {
     BIO *b;
@@ -301,6 +316,7 @@ int BN_print_fp(FILE *fp, const BIGNUM *a)
 }
 # endif
 
+//Write the hexadecimal encoding of a, with a leading '-' for negative numbers, to the BIO.
 int BN_print(BIO *bp, const BIGNUM *a)
 {
     int i, j, v, z = 0;

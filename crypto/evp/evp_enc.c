@@ -18,6 +18,8 @@
 #include "internal/evp_int.h"
 #include "evp_locl.h"
 
+//Clears all information from a cipher context and free up any allocated memory associate with it, except the ctx itself. This function should be called anytime ctx is to be reused for another EVP_CipherInit() / EVP_CipherUpdate() / EVP_CipherFinal() series of calls.
+//Returns 1 for success and 0 for failure.
 int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *c)
 {
     if (c == NULL)
@@ -37,11 +39,13 @@ int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *c)
     return 1;
 }
 
+//Creates a cipher context.
 EVP_CIPHER_CTX *EVP_CIPHER_CTX_new(void)
 {
     return OPENSSL_zalloc(sizeof(EVP_CIPHER_CTX));
 }
 
+//Clears all information from a cipher context and free up any allocated memory associate with it, including ctx itself. This function should be called after all operations using a cipher are complete so sensitive information does not remain in memory.
 void EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx)
 {
     EVP_CIPHER_CTX_reset(ctx);
@@ -230,6 +234,14 @@ int EVP_EncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher, const unsigne
     return EVP_CipherInit(ctx, cipher, key, iv, 1);
 }
 
+//Sets up cipher context 'ctx' for encryption with cipher 'cipher' from ENGINE 'impl'. 
+//'ctx' must be created before calling this function. 
+//'cipher' is normally supplied by a function such as EVP_aes_256_cbc(). 
+//If 'impl' is NULL then the default implementation is used. 
+//'key' is the symmetric key to use and 'iv' is the IV to use (if necessary), the actual number of bytes used for the key and IV depends on the cipher. 
+//It is possible to set all parameters to NULL except 'cipher' in an initial call 
+//	and supply the remaining parameters in subsequent calls, all of which have type set to NULL. 
+//	This is done when the default cipher parameters are not appropriate.
 int EVP_EncryptInit_ex(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher, ENGINE *impl, const unsigned char *key, const unsigned char *iv)
 {
     return EVP_CipherInit_ex(ctx, cipher, impl, key, iv, 1);

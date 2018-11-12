@@ -50,6 +50,7 @@ static const unsigned char odd_parity[256] = {
     254
 };
 
+//Sets the parity of the passed key to odd.
 void DES_set_odd_parity(DES_cblock *key)
 {
     unsigned int i;
@@ -58,6 +59,7 @@ void DES_set_odd_parity(DES_cblock *key)
         (*key)[i] = odd_parity[(*key)[i]];
 }
 
+//Check if the key have correct parity
 int DES_check_key_parity(const_DES_cblock *key)
 {
     unsigned int i;
@@ -99,6 +101,7 @@ static const DES_cblock weak_keys[NUM_WEAK_KEY] = {
     {0xFE, 0xE0, 0xFE, 0xE0, 0xFE, 0xF1, 0xFE, 0xF1}
 };
 
+//Returns 1 if the passed key is a weak key, 0 if it is ok.
 int DES_is_weak_key(const_DES_cblock *key)
 {
     int i;

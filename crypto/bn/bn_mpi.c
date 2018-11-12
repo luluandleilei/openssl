@@ -11,6 +11,10 @@
 #include "internal/cryptlib.h"
 #include "bn_lcl.h"
 
+//Convert BIGNUMs to a format that consists of the number's length in bytes represented as a 4-byte big-endian number, 
+//and the number itself in big-endian format, where the most significant bit signals a negative number 
+//(the representation of numbers with the MSB set is prefixed with null byte).
+//'d' must be large enough to hold the result. The size can be determined by calling BN_bn2mpi(a, NULL).
 int BN_bn2mpi(const BIGNUM *a, unsigned char *d)
 {
     int bits;
@@ -39,6 +43,9 @@ int BN_bn2mpi(const BIGNUM *a, unsigned char *d)
     return (num + 4 + ext);
 }
 
+//Convert BIGNUMs from a format that consists of the number's length in bytes represented as a 4-byte big-endian number,
+//and the number itself in big-endian format, where the most significant bit signals a negative number 
+//(the representation of numbers with the MSB set is prefixed with null byte)
 BIGNUM *BN_mpi2bn(const unsigned char *d, int n, BIGNUM *ain)
 {
     long len;

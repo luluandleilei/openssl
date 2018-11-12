@@ -321,8 +321,7 @@ static int cms_RecipientInfo_ktri_encrypt(CMS_ContentInfo *cms,
             goto err;
     }
 
-    if (EVP_PKEY_CTX_ctrl(pctx, -1, EVP_PKEY_OP_ENCRYPT,
-                          EVP_PKEY_CTRL_CMS_ENCRYPT, 0, ri) <= 0) {
+    if (EVP_PKEY_CTX_ctrl(pctx, -1, EVP_PKEY_OP_ENCRYPT, EVP_PKEY_CTRL_CMS_ENCRYPT, 0, ri) <= 0) {
         CMSerr(CMS_F_CMS_RECIPIENTINFO_KTRI_ENCRYPT, CMS_R_CTRL_ERROR);
         goto err;
     }

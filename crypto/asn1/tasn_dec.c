@@ -115,8 +115,7 @@ ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 }
 
 int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
-                     const ASN1_ITEM *it,
-                     int tag, int aclass, char opt, ASN1_TLC *ctx)
+                     const ASN1_ITEM *it, int tag, int aclass, char opt, ASN1_TLC *ctx)
 {
     int rv;
     rv = asn1_item_embed_d2i(pval, in, len, it, tag, aclass, opt, ctx, 0);

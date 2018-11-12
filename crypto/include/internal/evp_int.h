@@ -16,6 +16,9 @@
  */
 #define EVP_MD_CTX_FLAG_KEEP_PKEY_CTX   0x0400
 
+//The EVP_PKEY_CTX structure is an opaque public key algorithm context used by the OpenSSL high level public key API.
+//Contexts MUST NOT be shared between threads: 
+//	that is it is not permissible to use the same context simultaneously in two threads.
 struct evp_pkey_ctx_st {
     /* Method associated with this operation */
     const EVP_PKEY_METHOD *pmeth;

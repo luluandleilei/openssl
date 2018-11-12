@@ -123,6 +123,7 @@ size_t HMAC_size(const HMAC_CTX *ctx)
     return (size < 0) ? 0 : size;
 }
 
+//Creates a new HMAC_CTX in heap memory.
 HMAC_CTX *HMAC_CTX_new(void)
 {
     HMAC_CTX *ctx = OPENSSL_zalloc(sizeof(HMAC_CTX));
@@ -146,6 +147,7 @@ static void hmac_ctx_cleanup(HMAC_CTX *ctx)
     OPENSSL_cleanse(ctx->key, sizeof(ctx->key));
 }
 
+//Erases the key and other data from the HMAC_CTX, releases any associated resources and finally frees the HMAC_CTX itself.
 void HMAC_CTX_free(HMAC_CTX *ctx)
 {
     if (ctx != NULL) {
@@ -174,6 +176,7 @@ static int hmac_ctx_alloc_mds(HMAC_CTX *ctx)
     return 1;
 }
 
+//Zeroes an existing HMAC_CTX and associated resources, making it suitable for new computations as if it was newly created with HMAC_CTX_new()
 int HMAC_CTX_reset(HMAC_CTX *ctx)
 {
     hmac_ctx_cleanup(ctx);

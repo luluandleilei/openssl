@@ -25,9 +25,7 @@ static void engine_unregister_all_RSA(void)
 int ENGINE_register_RSA(ENGINE *e)
 {
     if (e->rsa_meth)
-        return engine_table_register(&rsa_table,
-                                     engine_unregister_all_RSA, e, &dummy_nid,
-                                     1, 0);
+        return engine_table_register(&rsa_table, engine_unregister_all_RSA, e, &dummy_nid, 1, 0);
     return 1;
 }
 

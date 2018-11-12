@@ -87,17 +87,20 @@ const BIGNUM *BN_value_one(void)
     return &const_one;
 }
 
+//Returns the number of significant bits in a word. 
+//If we take 0x00000432 as an example, it returns 11, not 16, not 32. 
+//Basically, except for a zero, it returns floor(log2(w))+1.
 int BN_num_bits_word(BN_ULONG l)
 {
     BN_ULONG x, mask;
     int bits = (l != 0);
 
-#if BN_BITS2 > 32
-    x = l >> 32;
-    mask = (0 - x) & BN_MASK2;
-    mask = (0 - (mask >> (BN_BITS2 - 1)));
-    bits += 32 & mask;
-    l ^= (x ^ l) & mask;
+#if BN_BITS2 > 32								//判断l的高32位是否为0，不为0说明低32位都为有效位，为0再判断低32位
+    x = l >> 32;								//x的高32位全为0，x低32位为l的高32位
+    mask = (0 - x) & BN_MASK2;					//若x为0则mask为0，若x不为0则mask的最高位为1
+    mask = (0 - (mask >> (BN_BITS2 - 1)));		//若x为0则mask为0，若x不为0则mask为0Xffffffffffffffff
+    bits += 32 & mask;							//若mask为0则bits累加0，若mask为0Xffffffffffffffff则bits累加32
+    l ^= (x ^ l) & mask;						//若l高32位不为0，则l为其高32位右移32位的结果，若l高32位为0，则l不变
 #endif
 
     x = l >> 16;
@@ -132,6 +135,7 @@ int BN_num_bits_word(BN_ULONG l)
     return bits;
 }
 
+//Returns the number of significant bits in a BIGNUM, following the same principle as BN_num_bits_word()
 int BN_num_bits(const BIGNUM *a)
 {
     int i = a->top - 1;
@@ -369,6 +373,8 @@ int BN_set_word(BIGNUM *a, BN_ULONG w)
     return 1;
 }
 
+//Converts the positive integer in big-endian form of length len at s into a BIGNUM and places it in ret. 
+//If ret is NULL, a new BIGNUM is created.
 BIGNUM *BN_bin2bn(const unsigned char *s, int len, BIGNUM *ret)
 {
     unsigned int i, m;
@@ -389,8 +395,8 @@ BIGNUM *BN_bin2bn(const unsigned char *s, int len, BIGNUM *ret)
         ret->top = 0;
         return ret;
     }
-    i = ((n - 1) / BN_BYTES) + 1;
-    m = ((n - 1) % (BN_BYTES));
+    i = ((n - 1) / BN_BYTES) + 1;	//计算需要分配的总的BN_ULONG块的个数 i = (n + (BN_BYTES - 1)) / BN_BYTES
+    m = ((n - 1) % (BN_BYTES));		//计算最高位的BN_ULONG块所实际占用的字节数
     if (bn_wexpand(ret, (int)i) == NULL) {
         BN_free(bn);
         return NULL;
@@ -449,14 +455,21 @@ static int bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
     atop = a->top * BN_BYTES;
     for (i = 0, j = 0, to += tolen; j < (size_t)tolen; j++) {
         l = a->d[i / BN_BYTES];
-        mask = 0 - ((j - atop) >> (8 * sizeof(i) - 1));
+		//若j < atop，则mask为0Xffffffff，若j >= atop, 则mask为 0
+		//在j < atop时，*to被赋值对应的l的值，当j >= atop时，*to被赋值为0
+        mask = 0 - ((j - atop) >> (8 * sizeof(i) - 1)); 
         *--to = (unsigned char)(l >> (8 * (i % BN_BYTES)) & mask);
-        i += (i - lasti) >> (8 * sizeof(i) - 1); /* stay on last limb */
+        //当i < lasti时i递增1，当i==lasti时i保持不变，以防止a->d[i / BN_BYTES]访问越界
+        i += (i - lasti) >> (8 * sizeof(i) - 1); /* stay on last limb */ 
     }
 
     return tolen;
 }
 
+//Converts the absolute value of 'a' into big-endian form and stores it at 'to'. 
+//'tolen' indicates the length of the output buffer 'to'. 
+//The result is padded with zeroes if necessary. 
+//If 'tolen' is less than BN_num_bytes(a) an error is returned
 int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
 {
     if (tolen < 0)
@@ -464,11 +477,15 @@ int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
     return bn2binpad(a, to, tolen);
 }
 
+//Converts the absolute value of 'a' into big-endian form and stores it at 'to'. 
+//'to' must point to BN_num_bytes(a) bytes of memory.
 int BN_bn2bin(const BIGNUM *a, unsigned char *to)
 {
     return bn2binpad(a, to, -1);
 }
 
+//Converts the positive integer in little-endian form of length len at s into a BIGNUM and places it in ret. 
+//If ret is NULL, a new BIGNUM is created.
 BIGNUM *BN_lebin2bn(const unsigned char *s, int len, BIGNUM *ret)
 {
     unsigned int i, m;
@@ -516,6 +533,10 @@ BIGNUM *BN_lebin2bn(const unsigned char *s, int len, BIGNUM *ret)
     return ret;
 }
 
+//Converts the absolute value of 'a' into little-endian form and stores it at 'to'. 
+//'tolen' indicates the length of the output buffer 'to'. 
+//The result is padded with zeroes if necessary. 
+//If 'tolen' is less than BN_num_bytes(a) an error is returned
 int BN_bn2lebinpad(const BIGNUM *a, unsigned char *to, int tolen)
 {
     int i;
@@ -690,6 +711,8 @@ void BN_set_negative(BIGNUM *a, int b)
         a->neg = 0;
 }
 
+//bn_cmp_words(a, b, n) operates on the n word arrays a and b. 
+//It returns 1, 0 and -1 if a is greater than, equal and less than b.
 int bn_cmp_words(const BN_ULONG *a, const BN_ULONG *b, int n)
 {
     int i;
@@ -945,8 +968,7 @@ void BN_GENCB_set_old(BN_GENCB *gencb, void (*callback) (int, int, void *),
 }
 
 /* Populate a BN_GENCB structure with a "new"-style callback */
-void BN_GENCB_set(BN_GENCB *gencb, int (*callback) (int, int, BN_GENCB *),
-                  void *cb_arg)
+void BN_GENCB_set(BN_GENCB *gencb, int (*callback) (int, int, BN_GENCB *), void *cb_arg)
 {
     BN_GENCB *tmp_gencb = gencb;
     tmp_gencb->ver = 2;

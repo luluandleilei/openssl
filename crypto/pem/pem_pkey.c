@@ -22,8 +22,7 @@
 
 int pem_check_suffix(const char *pem_str, const char *suffix);
 
-EVP_PKEY *PEM_read_bio_PrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb,
-                                  void *u)
+EVP_PKEY *PEM_read_bio_PrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb, void *u)
 {
     char *nm = NULL;
     const unsigned char *p = NULL;
@@ -32,8 +31,7 @@ EVP_PKEY *PEM_read_bio_PrivateKey(BIO *bp, EVP_PKEY **x, pem_password_cb *cb,
     int slen;
     EVP_PKEY *ret = NULL;
 
-    if (!PEM_bytes_read_bio_secmem(&data, &len, &nm, PEM_STRING_EVP_PKEY, bp,
-                                   cb, u))
+    if (!PEM_bytes_read_bio_secmem(&data, &len, &nm, PEM_STRING_EVP_PKEY, bp, cb, u))
         return NULL;
     p = data;
 

@@ -497,6 +497,7 @@ const STACK_OF(X509_NAME) *SSL_get0_CA_list(const SSL *s)
     return s->ca_names != NULL ? s->ca_names : s->ctx->ca_names;
 }
 
+//In server mode, when requesting a client certificate, the server must send the list of CAs of which it will accept client certificates. This list is not influenced by the contents of CAfile or CApath and must explicitly be set using the SSL_CTX_set_client_CA_list family of functions.
 void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, STACK_OF(X509_NAME) *name_list)
 {
     SSL_CTX_set0_CA_list(ctx, name_list);
@@ -904,9 +905,14 @@ int ssl_cert_set_cert_store(CERT *c, X509_STORE *store, int chain, int ref)
     return 1;
 }
 
-//If an application doesn't set its own security callback the default callback is used. It is intended to provide sane defaults. The meaning of each level is described below.
+//If an application doesn't set its own security callback the default callback is used. 
+//It is intended to provide sane defaults. The meaning of each level is described below.
 //Level 0 -- Everything is permitted. This retains compatibility with previous versions of OpenSSL.
-//Level 1 -- The security level corresponds to a minimum of 80 bits of security. Any parameters offering below 80 bits of security are excluded. As a result RSA, DSA and DH keys shorter than 1024 bits and ECC keys shorter than 160 bits are prohibited. All export cipher suites are prohibited since they all offer less than 80 bits of security. SSL version 2 is prohibited. Any cipher suite using MD5 for the MAC is also prohibited.
+//Level 1 -- The security level corresponds to a minimum of 80 bits of security. 
+//				Any parameters offering below 80 bits of security are excluded. 
+//				As a result RSA, DSA and DH keys shorter than 1024 bits and ECC keys shorter than 160 bits are prohibited. 
+//				All export cipher suites are prohibited since they all offer less than 80 bits of security. 
+//				SSL version 2 is prohibited. Any cipher suite using MD5 for the MAC is also prohibited.
 //Level 2 -- Security level set to 112 bits of security. As a result RSA, DSA and DH keys shorter than 2048 bits and ECC keys shorter than 224 bits are prohibited. In addition to the level 1 exclusions any cipher suite using RC4 is also prohibited. SSL version 3 is also not allowed. Compression is disabled.
 //Level 3 -- Security level set to 128 bits of security. As a result RSA, DSA and DH keys shorter than 3072 bits and ECC keys shorter than 256 bits are prohibited. In addition to the level 2 exclusions cipher suites not offering forward secrecy are prohibited. TLS versions below 1.1 are not permitted. Session tickets are disabled.
 //Level 4 -- Security level set to 192 bits of security. As a result RSA, DSA and DH keys shorter than 7680 bits and ECC keys shorter than 384 bits are prohibited. Cipher suites using SHA1 for the MAC are prohibited. TLS versions below 1.2 are not permitted.

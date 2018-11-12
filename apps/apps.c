@@ -653,8 +653,7 @@ X509 *load_cert(const char *file, int format, const char *cert_descrip)
     if (format == FORMAT_ASN1) {
         x = d2i_X509_bio(cert, NULL);
     } else if (format == FORMAT_PEM) {
-        x = PEM_read_bio_X509_AUX(cert, NULL,
-                                  (pem_password_cb *)password_callback, NULL);
+        x = PEM_read_bio_X509_AUX(cert, NULL, (pem_password_cb *)password_callback, NULL);
     } else if (format == FORMAT_PKCS12) {
         if (!load_pkcs12(cert, cert_descrip, NULL, NULL, NULL, &x, NULL))
             goto end;

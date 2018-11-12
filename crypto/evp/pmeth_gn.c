@@ -16,12 +16,13 @@
 #include "internal/asn1_int.h"
 #include "internal/evp_int.h"
 
+//Initializes a public key algorithm context using key pkey for a parameters generation operation.
+//After the call to the function, algorithm specific control operations can be performed to set any appropriate parameters for the operation.
 int EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx)
 {
     int ret;
     if (!ctx || !ctx->pmeth || !ctx->pmeth->paramgen) {
-        EVPerr(EVP_F_EVP_PKEY_PARAMGEN_INIT,
-               EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+        EVPerr(EVP_F_EVP_PKEY_PARAMGEN_INIT, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
         return -2;
     }
     ctx->operation = EVP_PKEY_OP_PARAMGEN;
@@ -33,12 +34,13 @@ int EVP_PKEY_paramgen_init(EVP_PKEY_CTX *ctx)
     return ret;
 }
 
+//Performs a parameters generation operation, the generated parameters is written to ppkey.
+//The functions can be called more than once on the same context if several operations are performed using the same parameters.
 int EVP_PKEY_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
 {
     int ret;
     if (!ctx || !ctx->pmeth || !ctx->pmeth->paramgen) {
-        EVPerr(EVP_F_EVP_PKEY_PARAMGEN,
-               EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+        EVPerr(EVP_F_EVP_PKEY_PARAMGEN, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
         return -2;
     }
 
@@ -66,12 +68,13 @@ int EVP_PKEY_paramgen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
     return ret;
 }
 
+//Initializes a public key algorithm context using key pkey for a key generation operation.
+//After the call to this function, algorithm specific control operations can be performed to set any appropriate parameters for the operation.
 int EVP_PKEY_keygen_init(EVP_PKEY_CTX *ctx)
 {
     int ret;
     if (!ctx || !ctx->pmeth || !ctx->pmeth->keygen) {
-        EVPerr(EVP_F_EVP_PKEY_KEYGEN_INIT,
-               EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+        EVPerr(EVP_F_EVP_PKEY_KEYGEN_INIT, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
         return -2;
     }
     ctx->operation = EVP_PKEY_OP_KEYGEN;
@@ -83,13 +86,14 @@ int EVP_PKEY_keygen_init(EVP_PKEY_CTX *ctx)
     return ret;
 }
 
+//Performs a key generation operation, the generated key is written to ppkey.
+//The functions can be called more than once on the same context if several operations are performed using the same parameters.
 int EVP_PKEY_keygen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
 {
     int ret;
 
     if (!ctx || !ctx->pmeth || !ctx->pmeth->keygen) {
-        EVPerr(EVP_F_EVP_PKEY_KEYGEN,
-               EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
+        EVPerr(EVP_F_EVP_PKEY_KEYGEN, EVP_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE);
         return -2;
     }
     if (ctx->operation != EVP_PKEY_OP_KEYGEN) {
@@ -113,11 +117,13 @@ int EVP_PKEY_keygen(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey)
     return ret;
 }
 
+//Sets the key or parameter generation callback to 'cb'. 
 void EVP_PKEY_CTX_set_cb(EVP_PKEY_CTX *ctx, EVP_PKEY_gen_cb *cb)
 {
     ctx->pkey_gencb = cb;
 }
 
+//Returns the key or parameter generation callback
 EVP_PKEY_gen_cb *EVP_PKEY_CTX_get_cb(EVP_PKEY_CTX *ctx)
 {
     return ctx->pkey_gencb;
@@ -141,6 +147,9 @@ void evp_pkey_set_cb_translate(BN_GENCB *cb, EVP_PKEY_CTX *ctx)
     BN_GENCB_set(cb, trans_cb, ctx);
 }
 
+//Returns parameters associated with the generation operation. 
+//If idx is -1 the total number of parameters available is returned. 
+//Any non negative value returns the value of that parameter.
 int EVP_PKEY_CTX_get_keygen_info(EVP_PKEY_CTX *ctx, int idx)
 {
     if (idx == -1)
@@ -150,8 +159,7 @@ int EVP_PKEY_CTX_get_keygen_info(EVP_PKEY_CTX *ctx, int idx)
     return ctx->keygen_info[idx];
 }
 
-EVP_PKEY *EVP_PKEY_new_mac_key(int type, ENGINE *e,
-                               const unsigned char *key, int keylen)
+EVP_PKEY *EVP_PKEY_new_mac_key(int type, ENGINE *e, const unsigned char *key, int keylen)
 {
     EVP_PKEY_CTX *mac_ctx = NULL;
     EVP_PKEY *mac_key = NULL;

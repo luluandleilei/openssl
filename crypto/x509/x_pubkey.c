@@ -18,8 +18,8 @@
 #include <openssl/dsa.h>
 
 struct X509_pubkey_st {
-    X509_ALGOR *algor;
-    ASN1_BIT_STRING *public_key;
+    X509_ALGOR *algor;				//Public Key Algorithm
+    ASN1_BIT_STRING *public_key;	//Subject Public Key
     EVP_PKEY *pkey;		//pkey 与 public_key对应
 };
 

@@ -446,8 +446,10 @@ int (*EVP_MD_CTX_update_fn(EVP_MD_CTX *ctx))(EVP_MD_CTX *ctx,
 void EVP_MD_CTX_set_update_fn(EVP_MD_CTX *ctx,
                               int (*update) (EVP_MD_CTX *ctx,
                                              const void *data, size_t count));
+//EVP_MD_size() and EVP_MD_CTX_size() return the size of the message digest when passed an EVP_MD or an EVP_MD_CTX structure, i.e. the size of the hash.
 # define EVP_MD_CTX_size(e)              EVP_MD_size(EVP_MD_CTX_md(e))
 # define EVP_MD_CTX_block_size(e)        EVP_MD_block_size(EVP_MD_CTX_md(e))
+//EVP_MD_type() and EVP_MD_CTX_type() return the NID of the OBJECT IDENTIFIER representing the given message digest when passed an EVP_MD structure. For example EVP_MD_type(EVP_sha1()) returns NID_sha1. This function is normally used when setting ASN1 OIDs.
 # define EVP_MD_CTX_type(e)              EVP_MD_type(EVP_MD_CTX_md(e))
 EVP_PKEY_CTX *EVP_MD_CTX_pkey_ctx(const EVP_MD_CTX *ctx);
 void EVP_MD_CTX_set_pkey_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pctx);
@@ -460,6 +462,7 @@ int EVP_CIPHER_impl_ctx_size(const EVP_CIPHER *cipher);
 int EVP_CIPHER_key_length(const EVP_CIPHER *cipher);
 int EVP_CIPHER_iv_length(const EVP_CIPHER *cipher);
 unsigned long EVP_CIPHER_flags(const EVP_CIPHER *cipher);
+//Return the block cipher mode: EVP_CIPH_ECB_MODE, EVP_CIPH_CBC_MODE, EVP_CIPH_CFB_MODE or EVP_CIPH_OFB_MODE. If the cipher is a stream cipher then EVP_CIPH_STREAM_CIPHER is returned.
 # define EVP_CIPHER_mode(e)              (EVP_CIPHER_flags(e) & EVP_CIPH_MODE)
 
 const EVP_CIPHER *EVP_CIPHER_CTX_cipher(const EVP_CIPHER_CTX *ctx);
@@ -483,6 +486,7 @@ void *EVP_CIPHER_CTX_set_cipher_data(EVP_CIPHER_CTX *ctx, void *cipher_data);
 # if OPENSSL_API_COMPAT < 0x10100000L
 #  define EVP_CIPHER_CTX_flags(c)       EVP_CIPHER_flags(EVP_CIPHER_CTX_cipher(c))
 # endif
+//Return the block cipher mode: EVP_CIPH_ECB_MODE, EVP_CIPH_CBC_MODE, EVP_CIPH_CFB_MODE or EVP_CIPH_OFB_MODE. If the cipher is a stream cipher then EVP_CIPH_STREAM_CIPHER is returned.
 # define EVP_CIPHER_CTX_mode(c)         EVP_CIPHER_mode(EVP_CIPHER_CTX_cipher(c))
 
 # define EVP_ENCODE_LENGTH(l)    ((((l)+2)/3*4)+((l)/48+1)*2+80)
@@ -595,13 +599,8 @@ __owur int EVP_DecryptFinal(EVP_CIPHER_CTX *ctx, unsigned char *outm,
 /*__owur*/ int EVP_DecryptFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *outm,
                                    int *outl);
 
-__owur int EVP_CipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
-                          const unsigned char *key, const unsigned char *iv,
-                          int enc);
-/*__owur*/ int EVP_CipherInit_ex(EVP_CIPHER_CTX *ctx,
-                                 const EVP_CIPHER *cipher, ENGINE *impl,
-                                 const unsigned char *key,
-                                 const unsigned char *iv, int enc);
+__owur int EVP_CipherInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher, const unsigned char *key, const unsigned char *iv, int enc);
+/*__owur*/ int EVP_CipherInit_ex(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher, ENGINE *impl, const unsigned char *key, const unsigned char *iv, int enc);
 __owur int EVP_CipherUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out,
                             int *outl, const unsigned char *in, int inl);
 __owur int EVP_CipherFinal(EVP_CIPHER_CTX *ctx, unsigned char *outm,
@@ -1290,16 +1289,19 @@ void EVP_PKEY_asn1_set_security_bits(EVP_PKEY_ASN1_METHOD *ameth, int (*pkey_sec
 
 # define EVP_PKEY_ALG_CTRL               0x1000
 
+//the maximum size of the output buffer will be automatically calculated or checked in corresponding EVP methods by the EVP framework. 
+//Thus the implementations of these methods don't need to care about handling the case of returning output buffer size by themselves. 
+//For details on the output buffer size, refer to EVP_PKEY_sign.
 # define EVP_PKEY_FLAG_AUTOARGLEN        2
 /*
  * Method handles all operations: don't assume any digest related defaults.
  */
+//indicate the signctx() method of an EVP_PKEY_METHOD is always called by the EVP framework while doing a digest signing operation by calling EVP_DigestSignFinal.
 # define EVP_PKEY_FLAG_SIGCTX_CUSTOM     4
 
 const EVP_PKEY_METHOD *EVP_PKEY_meth_find(int type);
 EVP_PKEY_METHOD *EVP_PKEY_meth_new(int id, int flags);
-void EVP_PKEY_meth_get0_info(int *ppkey_id, int *pflags,
-                             const EVP_PKEY_METHOD *meth);
+void EVP_PKEY_meth_get0_info(int *ppkey_id, int *pflags, const EVP_PKEY_METHOD *meth);
 void EVP_PKEY_meth_copy(EVP_PKEY_METHOD *dst, const EVP_PKEY_METHOD *src);
 void EVP_PKEY_meth_free(EVP_PKEY_METHOD *pmeth);
 int EVP_PKEY_meth_add0(const EVP_PKEY_METHOD *pmeth);
@@ -1353,13 +1355,9 @@ void EVP_PKEY_CTX_set_app_data(EVP_PKEY_CTX *ctx, void *data);
 void *EVP_PKEY_CTX_get_app_data(EVP_PKEY_CTX *ctx);
 
 int EVP_PKEY_sign_init(EVP_PKEY_CTX *ctx);
-int EVP_PKEY_sign(EVP_PKEY_CTX *ctx,
-                  unsigned char *sig, size_t *siglen,
-                  const unsigned char *tbs, size_t tbslen);
+int EVP_PKEY_sign(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *siglen, const unsigned char *tbs, size_t tbslen);
 int EVP_PKEY_verify_init(EVP_PKEY_CTX *ctx);
-int EVP_PKEY_verify(EVP_PKEY_CTX *ctx,
-                    const unsigned char *sig, size_t siglen,
-                    const unsigned char *tbs, size_t tbslen);
+int EVP_PKEY_verify(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t siglen, const unsigned char *tbs, size_t tbslen);
 int EVP_PKEY_verify_recover_init(EVP_PKEY_CTX *ctx);
 int EVP_PKEY_verify_recover(EVP_PKEY_CTX *ctx,
                             unsigned char *rout, size_t *routlen,

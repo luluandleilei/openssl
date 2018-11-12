@@ -72,17 +72,13 @@ typedef struct extensions_definition_st {
      */
     int (*init)(SSL *s, unsigned int context);
     /* Parse extension sent from client to server */
-    int (*parse_ctos)(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
-                      size_t chainidx);
+    int (*parse_ctos)(SSL *s, PACKET *pkt, unsigned int context, X509 *x, size_t chainidx);
     /* Parse extension send from server to client */
-    int (*parse_stoc)(SSL *s, PACKET *pkt, unsigned int context, X509 *x,
-                      size_t chainidx);
+    int (*parse_stoc)(SSL *s, PACKET *pkt, unsigned int context, X509 *x, size_t chainidx);
     /* Construct extension sent from server to client */
-    EXT_RETURN (*construct_stoc)(SSL *s, WPACKET *pkt, unsigned int context,
-                                 X509 *x, size_t chainidx);
+    EXT_RETURN (*construct_stoc)(SSL *s, WPACKET *pkt, unsigned int context, X509 *x, size_t chainidx);
     /* Construct extension sent from client to server */
-    EXT_RETURN (*construct_ctos)(SSL *s, WPACKET *pkt, unsigned int context,
-                                 X509 *x, size_t chainidx);
+    EXT_RETURN (*construct_ctos)(SSL *s, WPACKET *pkt, unsigned int context, X509 *x, size_t chainidx);
     /*
      * Finalise extension after parsing. Always called where an extensions was
      * initialised even if the extension was not present. |sent| is set to 1 if
@@ -548,8 +544,7 @@ int extension_is_relevant(SSL *s, unsigned int extctx, unsigned int thisctx)
  * found, or an internal error occurred. We only check duplicates for
  * extensions that we know about. We ignore others.
  */
-int tls_collect_extensions(SSL *s, PACKET *packet, unsigned int context,
-                           RAW_EXTENSION **res, size_t *len, int init)
+int tls_collect_extensions(SSL *s, PACKET *packet, unsigned int context, RAW_EXTENSION **res, size_t *len, int init)
 {
     PACKET extensions = *packet;
     size_t i = 0;
@@ -762,8 +757,7 @@ int tls_parse_all_extensions(SSL *s, int context, RAW_EXTENSION *exts, X509 *x,
     return 1;
 }
 
-int should_add_extension(SSL *s, unsigned int extctx, unsigned int thisctx,
-                         int max_version)
+int should_add_extension(SSL *s, unsigned int extctx, unsigned int thisctx, int max_version)
 {
     /* Skip if not relevant for our context */
     if ((extctx & thisctx) == 0)
@@ -787,8 +781,7 @@ int should_add_extension(SSL *s, unsigned int extctx, unsigned int thisctx,
  * 0 being the first in the chain). Returns 1 on success or 0 on failure. On a
  * failure construction stops at the first extension to fail to construct.
  */
-int tls_construct_extensions(SSL *s, WPACKET *pkt, unsigned int context,
-                             X509 *x, size_t chainidx)
+int tls_construct_extensions(SSL *s, WPACKET *pkt, unsigned int context, X509 *x, size_t chainidx)
 {
     size_t i;
     int min_version, max_version = 0, reason;
@@ -802,18 +795,15 @@ int tls_construct_extensions(SSL *s, WPACKET *pkt, unsigned int context,
                 */
             || ((context &
                  (SSL_EXT_CLIENT_HELLO | SSL_EXT_TLS1_2_SERVER_HELLO)) != 0
-                && !WPACKET_set_flags(pkt,
-                                     WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH))) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_EXTENSIONS,
-                 ERR_R_INTERNAL_ERROR);
+                && !WPACKET_set_flags(pkt, WPACKET_FLAGS_ABANDON_ON_ZERO_LENGTH))) {
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_EXTENSIONS, ERR_R_INTERNAL_ERROR);
         return 0;
     }
 
     if ((context & SSL_EXT_CLIENT_HELLO) != 0) {
         reason = ssl_get_min_max_version(s, &min_version, &max_version, NULL);
         if (reason != 0) {
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_EXTENSIONS,
-                     reason);
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_EXTENSIONS, reason);
             return 0;
         }
     }
@@ -829,16 +819,14 @@ int tls_construct_extensions(SSL *s, WPACKET *pkt, unsigned int context,
     }
 
     for (i = 0, thisexd = ext_defs; i < OSSL_NELEM(ext_defs); i++, thisexd++) {
-        EXT_RETURN (*construct)(SSL *s, WPACKET *pkt, unsigned int context,
-                                X509 *x, size_t chainidx);
+        EXT_RETURN (*construct)(SSL *s, WPACKET *pkt, unsigned int context, X509 *x, size_t chainidx);
         EXT_RETURN ret;
 
         /* Skip if not relevant for our context */
         if (!should_add_extension(s, thisexd->context, context, max_version))
             continue;
 
-        construct = s->server ? thisexd->construct_stoc
-                              : thisexd->construct_ctos;
+        construct = s->server ? thisexd->construct_stoc : thisexd->construct_ctos;
 
         if (construct == NULL)
             continue;

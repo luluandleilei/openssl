@@ -172,8 +172,10 @@ BN_ULONG bn_sub_part_words(BN_ULONG *r,
  * a[1]*b[1]
  */
 /* dnX may not be positive, but n2/2+dnX has to be */
-void bn_mul_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
-                      int dna, int dnb, BN_ULONG *t)
+//bn_mul_recursive(r, a, b, n2, dna, dnb, t) operates on the word arrays a and b of length n2+dna and n2+dnb 
+//	(dna and dnb are currently allowed to be 0 or negative) and the 2*n2 word arrays r and t. 
+//n2 must be a power of 2. It computes a*b and places the result in r.
+void bn_mul_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2, int dna, int dnb, BN_ULONG *t)
 {
     int n = n2 / 2, c1, c2;
     int tna = n + dna, tnb = n + dnb;
@@ -319,8 +321,8 @@ void bn_mul_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
  * n+tn is the word length t needs to be n*4 is size, as does r
  */
 /* tnX may not be negative but less than n */
-void bn_mul_part_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n,
-                           int tna, int tnb, BN_ULONG *t)
+//bn_mul_part_recursive(r, a, b, n, tna, tnb, tmp) operates on the word arrays a and b of length n+tna and n+tnb and the 4*n word arrays r and tmp.
+void bn_mul_part_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n, int tna, int tnb, BN_ULONG *t)
 {
     int i, j, n2 = n * 2;
     int c1, c2, neg;
@@ -474,8 +476,8 @@ void bn_mul_part_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n,
  * a and b must be the same size, which is n2.
  * r needs to be n2 words and t needs to be n2*2
  */
-void bn_mul_low_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
-                          BN_ULONG *t)
+//bn_mul_low_recursive(r, a, b, n2, tmp) operates on the n2 word arrays r and tmp and the n2/2 word arrays a and b.
+void bn_mul_low_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2, BN_ULONG *t)
 {
     int n = n2 / 2;
 
@@ -494,6 +496,10 @@ void bn_mul_low_recursive(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n2,
 }
 #endif                          /* BN_RECURSION */
 
+//BN_mul() calls bn_mul_normal(), or an optimized implementation if the factors have the same size: 
+//	bn_mul_comba8() is used if they are 8 words long, bn_mul_recursive() if they are larger than BN_MULL_SIZE_NORMAL 
+//	and the size is an exact multiple of the word size, and bn_mul_part_recursive() for others that are larger than 
+//	BN_MULL_SIZE_NORMAL.
 int BN_mul(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
 {
     int ret = bn_mul_fixed_top(r, a, b, ctx);
@@ -619,6 +625,8 @@ int bn_mul_fixed_top(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, BN_CTX *ctx)
     return ret;
 }
 
+//bn_mul_normal(r, a, na, b, nb) operates on the na word array a, the nb word array b and the na+nb word array r. 
+//It computes a*b and places the result in r.
 void bn_mul_normal(BN_ULONG *r, BN_ULONG *a, int na, BN_ULONG *b, int nb)
 {
     BN_ULONG *rr;
@@ -661,6 +669,8 @@ void bn_mul_normal(BN_ULONG *r, BN_ULONG *a, int na, BN_ULONG *b, int nb)
     }
 }
 
+//bn_mul_low_normal(r, a, b, n) operates on the n word arrays r, a and b. 
+//It computes the n low words of a*b and places the result in r
 void bn_mul_low_normal(BN_ULONG *r, BN_ULONG *a, BN_ULONG *b, int n)
 {
     bn_mul_words(r, a, n, b[0]);

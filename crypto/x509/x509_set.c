@@ -164,8 +164,7 @@ const X509_ALGOR *X509_get0_tbs_sigalg(const X509 *x)
     return &x->cert_info.signature;
 }
 
-int X509_SIG_INFO_get(const X509_SIG_INFO *siginf, int *mdnid, int *pknid,
-                      int *secbits, uint32_t *flags)
+int X509_SIG_INFO_get(const X509_SIG_INFO *siginf, int *mdnid, int *pknid, int *secbits, uint32_t *flags)
 {
     if (mdnid != NULL)
         *mdnid = siginf->mdnid;
@@ -187,15 +186,13 @@ void X509_SIG_INFO_set(X509_SIG_INFO *siginf, int mdnid, int pknid,
     siginf->flags = flags;
 }
 
-int X509_get_signature_info(X509 *x, int *mdnid, int *pknid, int *secbits,
-                            uint32_t *flags)
+int X509_get_signature_info(X509 *x, int *mdnid, int *pknid, int *secbits, uint32_t *flags)
 {
     X509_check_purpose(x, -1, -1);
     return X509_SIG_INFO_get(&x->siginf, mdnid, pknid, secbits, flags);
 }
 
-static void x509_sig_info_init(X509_SIG_INFO *siginf, const X509_ALGOR *alg,
-                               const ASN1_STRING *sig)
+static void x509_sig_info_init(X509_SIG_INFO *siginf, const X509_ALGOR *alg, const ASN1_STRING *sig)
 {
     int pknid, mdnid;
     const EVP_MD *md;
@@ -204,8 +201,7 @@ static void x509_sig_info_init(X509_SIG_INFO *siginf, const X509_ALGOR *alg,
     siginf->pknid = NID_undef;
     siginf->secbits = -1;
     siginf->flags = 0;
-    if (!OBJ_find_sigid_algs(OBJ_obj2nid(alg->algorithm), &mdnid, &pknid)
-            || pknid == NID_undef)
+    if (!OBJ_find_sigid_algs(OBJ_obj2nid(alg->algorithm), &mdnid, &pknid) || pknid == NID_undef)
         return;
     siginf->pknid = pknid;
     if (mdnid == NID_undef) {

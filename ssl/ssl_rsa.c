@@ -298,7 +298,8 @@ int SSL_use_PrivateKey_ASN1(int type, SSL *ssl, const unsigned char *d,
     return ret;
 }
 
-//Loads the certificate x into ctx,
+//Loads the certificate x into ctx.
+//On success, the functions return 1. Otherwise check out the error stack to find out the reason.
 int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
 {
     int rv;
@@ -649,8 +650,7 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
             goto end;
         }
 
-        while ((ca = PEM_read_bio_X509(in, NULL, passwd_callback, passwd_callback_userdata))
-               != NULL) {
+        while ((ca = PEM_read_bio_X509(in, NULL, passwd_callback, passwd_callback_userdata)) != NULL) {
             if (ctx)
                 r = SSL_CTX_add0_chain_cert(ctx, ca);
             else
@@ -681,7 +681,8 @@ static int use_certificate_chain_file(SSL_CTX *ctx, SSL *ssl, const char *file)
     return ret;
 }
 
-//Loads a certificate chain from file into ctx. The certificates must be in PEM format and must be sorted starting with the subject's certificate (actual client or server certificate), followed by intermediate CA certificates if applicable, and ending at the highest level (root) CA. 
+//Loads a certificate chain from file into ctx. 
+//The certificates must be in PEM format and must be sorted starting with the subject's certificate (actual client or server certificate), followed by intermediate CA certificates if applicable, and ending at the highest level (root) CA. 
 int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
 {
     return use_certificate_chain_file(ctx, NULL, file);
@@ -838,18 +839,10 @@ static int serverinfo_process_buffer(unsigned int version,
          * looks like an old style <= TLSv1.2 extension.
          */
         if (version == SSL_SERVERINFOV1 || context == SYNTHV1CONTEXT) {
-            if (!SSL_CTX_add_server_custom_ext(ctx, ext_type,
-                                               serverinfo_srv_add_cb,
-                                               NULL, NULL,
-                                               serverinfo_srv_parse_cb,
-                                               NULL))
+            if (!SSL_CTX_add_server_custom_ext(ctx, ext_type, serverinfo_srv_add_cb, NULL, NULL, serverinfo_srv_parse_cb, NULL))
                 return 0;
         } else {
-            if (!SSL_CTX_add_custom_ext(ctx, ext_type, context,
-                                        serverinfoex_srv_add_cb,
-                                        NULL, NULL,
-                                        serverinfoex_srv_parse_cb,
-                                        NULL))
+            if (!SSL_CTX_add_custom_ext(ctx, ext_type, context, serverinfoex_srv_add_cb, NULL, NULL, serverinfoex_srv_parse_cb, NULL))
                 return 0;
         }
     }

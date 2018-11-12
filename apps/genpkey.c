@@ -101,9 +101,7 @@ int genpkey_main(int argc, char **argv)
                 goto opthelp;
             }
             if (pkey_ctrl_string(ctx, opt_arg()) <= 0) {
-                BIO_printf(bio_err,
-                           "%s: Error setting %s parameter:\n",
-                           prog, opt_arg());
+                BIO_printf(bio_err, "%s: Error setting %s parameter:\n", prog, opt_arg());
                 ERR_print_errors(bio_err);
                 goto end;
             }
@@ -117,8 +115,7 @@ int genpkey_main(int argc, char **argv)
             text = 1;
             break;
         case OPT_CIPHER:
-            if (!opt_cipher(opt_unknown(), &cipher)
-                || do_param == 1)
+            if (!opt_cipher(opt_unknown(), &cipher) || do_param == 1)
                 goto opthelp;
             if (EVP_CIPHER_mode(cipher) == EVP_CIPH_GCM_MODE ||
                 EVP_CIPHER_mode(cipher) == EVP_CIPH_CCM_MODE ||

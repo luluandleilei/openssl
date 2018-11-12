@@ -86,8 +86,7 @@ int BN_div(BIGNUM *dv, BIGNUM *rem, const BIGNUM *m, const BIGNUM *d,
 
 #else
 
-# if !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) \
-    && !defined(PEDANTIC) && !defined(BN_DIV3W)
+# if !defined(OPENSSL_NO_ASM) && !defined(OPENSSL_NO_INLINE_ASM) && !defined(PEDANTIC) && !defined(BN_DIV3W)
 #  if defined(__GNUC__) && __GNUC__>=2
 #   if defined(__i386) || defined (__i386__)
    /*-
@@ -134,8 +133,7 @@ int BN_div(BIGNUM *dv, BIGNUM *rem, const BIGNUM *m, const BIGNUM *d,
  *     rm->neg == num->neg                 (unless the remainder is zero)
  * If 'dv' or 'rm' is NULL, the respective value is not returned.
  */
-int BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor,
-           BN_CTX *ctx)
+int BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor, BN_CTX *ctx)
 {
     int norm_shift, i, loop;
     BIGNUM *tmp, wnum, *snum, *sdiv, *res;

@@ -33,9 +33,7 @@ EXT_RETURN tls_construct_ctos_renegotiate(SSL *s, WPACKET *pkt,
     return EXT_RETURN_SENT;
 }
 
-EXT_RETURN tls_construct_ctos_server_name(SSL *s, WPACKET *pkt,
-                                          unsigned int context, X509 *x,
-                                          size_t chainidx)
+EXT_RETURN tls_construct_ctos_server_name(SSL *s, WPACKET *pkt, unsigned int context, X509 *x, size_t chainidx)
 {
     if (s->ext.hostname == NULL)
         return EXT_RETURN_NOT_SENT;
@@ -47,12 +45,10 @@ EXT_RETURN tls_construct_ctos_server_name(SSL *s, WPACKET *pkt,
                /* Sub-packet for servername list (always 1 hostname)*/
             || !WPACKET_start_sub_packet_u16(pkt)
             || !WPACKET_put_bytes_u8(pkt, TLSEXT_NAMETYPE_host_name)
-            || !WPACKET_sub_memcpy_u16(pkt, s->ext.hostname,
-                                       strlen(s->ext.hostname))
+            || !WPACKET_sub_memcpy_u16(pkt, s->ext.hostname, strlen(s->ext.hostname))
             || !WPACKET_close(pkt)
             || !WPACKET_close(pkt)) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CTOS_SERVER_NAME,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_CONSTRUCT_CTOS_SERVER_NAME, ERR_R_INTERNAL_ERROR);
         return EXT_RETURN_FAIL;
     }
 
@@ -1319,8 +1315,7 @@ int tls_parse_stoc_maxfragmentlen(SSL *s, PACKET *pkt, unsigned int context,
     return 1;
 }
 
-int tls_parse_stoc_server_name(SSL *s, PACKET *pkt, unsigned int context,
-                               X509 *x, size_t chainidx)
+int tls_parse_stoc_server_name(SSL *s, PACKET *pkt, unsigned int context, X509 *x, size_t chainidx)
 {
     if (s->ext.hostname == NULL) {
         SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PARSE_STOC_SERVER_NAME,

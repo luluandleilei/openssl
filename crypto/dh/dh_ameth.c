@@ -438,8 +438,7 @@ static int dh_copy_parameters(EVP_PKEY *to, const EVP_PKEY *from)
         if (to->pkey.dh == NULL)
             return 0;
     }
-    return int_dh_param_copy(to->pkey.dh, from->pkey.dh,
-                             from->ameth == &dhx_asn1_meth);
+    return int_dh_param_copy(to->pkey.dh, from->pkey.dh, from->ameth == &dhx_asn1_meth);
 }
 
 static int dh_missing_parameters(const EVP_PKEY *a)
@@ -529,12 +528,12 @@ static int dh_pkey_param_check(const EVP_PKEY *pkey)
 }
 
 const EVP_PKEY_ASN1_METHOD dh_asn1_meth = {
-    EVP_PKEY_DH,
-    EVP_PKEY_DH,
-    0,
+    EVP_PKEY_DH,				//pkey_id
+    EVP_PKEY_DH,				//pkey_base_id
+    0, 							//pkey_flags
 
-    "DH",
-    "OpenSSL PKCS#3 DH method",
+    "DH",						//pem_str
+    "OpenSSL PKCS#3 DH method",	//info
 
     dh_pub_decode,
     dh_pub_encode,
@@ -568,42 +567,46 @@ const EVP_PKEY_ASN1_METHOD dh_asn1_meth = {
 };
 
 const EVP_PKEY_ASN1_METHOD dhx_asn1_meth = {
-    EVP_PKEY_DHX,
-    EVP_PKEY_DHX,
-    0,
+    EVP_PKEY_DHX,				//pkey_id
+    EVP_PKEY_DHX,				//pkey_base_id
+    0,							//pkey_flags
 
-    "X9.42 DH",
-    "OpenSSL X9.42 DH method",
+    "X9.42 DH",					//pem_str
+    "OpenSSL X9.42 DH method",	//info
 
-    dh_pub_decode,
-    dh_pub_encode,
-    dh_pub_cmp,
-    dh_public_print,
+    dh_pub_decode,				//pub_decode
+    dh_pub_encode,				//pub_encode
+    dh_pub_cmp,					//pub_cmp
+    dh_public_print,			//pub_print
 
-    dh_priv_decode,
-    dh_priv_encode,
-    dh_private_print,
+    dh_priv_decode,				//priv_decode
+    dh_priv_encode,				//priv_encode
+    dh_private_print,			//priv_print
 
-    int_dh_size,
-    dh_bits,
-    dh_security_bits,
+    int_dh_size,				//pkey_size
+    dh_bits,					//pkey_bits
+    dh_security_bits,			//pkey_security_bits
 
-    dh_param_decode,
-    dh_param_encode,
-    dh_missing_parameters,
-    dh_copy_parameters,
-    dh_cmp_parameters,
-    dh_param_print,
-    0,
+    dh_param_decode,			//param_decode
+    dh_param_encode,			//param_encode
+    dh_missing_parameters,		//param_missing
+    dh_copy_parameters,			//param_copy
+    dh_cmp_parameters,			//param_cmp
+    dh_param_print,				//param_print
+    0,							//sig_print
 
-    int_dh_free,
-    dh_pkey_ctrl,
+    int_dh_free,				//pkey_free
+    dh_pkey_ctrl,				//pkey_ctrl
 
-    0, 0, 0, 0, 0,
+    0,							//old_priv_decode
+    0,							//old_priv_encode
+    0,							//item_verify
+    0,							//item_sign
+    0,							//siginf_set
 
-    0,
-    dh_pkey_public_check,
-    dh_pkey_param_check
+    0,							//pkey_check
+    dh_pkey_public_check,		//pkey_public_check
+    dh_pkey_param_check			//pkey_param_check
 };
 
 #ifndef OPENSSL_NO_CMS

@@ -174,6 +174,7 @@ int EVP_CIPHER_type(const EVP_CIPHER *ctx)
     }
 }
 
+//EVP_CIPHER_block_size() and EVP_CIPHER_CTX_block_size() return the block size of a cipher when passed an EVP_CIPHER or EVP_CIPHER_CTX structure. The constant EVP_MAX_BLOCK_LENGTH is also the maximum block length for all ciphers.
 int EVP_CIPHER_block_size(const EVP_CIPHER *e)
 {
     return e->block_size;
@@ -235,6 +236,7 @@ void *EVP_CIPHER_CTX_set_cipher_data(EVP_CIPHER_CTX *ctx, void *cipher_data)
     return old_cipher_data;
 }
 
+//EVP_CIPHER_iv_length() and EVP_CIPHER_CTX_iv_length() return the IV length of a cipher when passed an EVP_CIPHER or EVP_CIPHER_CTX. It will return zero if the cipher does not use an IV. The constant EVP_MAX_IV_LENGTH is the maximum IV length for all ciphers.
 int EVP_CIPHER_iv_length(const EVP_CIPHER *cipher)
 {
     return cipher->iv_len;
@@ -275,16 +277,25 @@ void EVP_CIPHER_CTX_set_num(EVP_CIPHER_CTX *ctx, int num)
     ctx->num = num;
 }
 
+//EVP_CIPHER_key_length() and EVP_CIPHER_CTX_key_length() return the key length of a cipher when passed an EVP_CIPHER or EVP_CIPHER_CTX structure. The constant EVP_MAX_KEY_LENGTH is the maximum key length for all ciphers. Note: although EVP_CIPHER_key_length() is fixed for a given cipher, the value of EVP_CIPHER_CTX_key_length() may be different for variable key length ciphers.
+
+//Return the key length of a cipher when passed an EVP_CIPHER structure.
+//The value is fixed for a given cipher.
+//The constant EVP_MAX_KEY_LENGTH is the maximum key length for all ciphers.
 int EVP_CIPHER_key_length(const EVP_CIPHER *cipher)
 {
     return cipher->key_len;
 }
 
+//Return the key length of a cipher when passed an EVP_CIPHER_CTX structure.
+//The value may be different for variable key length ciphers.
+//The constant EVP_MAX_KEY_LENGTH is the maximum key length for all ciphers.
 int EVP_CIPHER_CTX_key_length(const EVP_CIPHER_CTX *ctx)
 {
     return ctx->key_len;
 }
 
+//EVP_CIPHER_nid() and EVP_CIPHER_CTX_nid() return the NID of a cipher when passed an EVP_CIPHER or EVP_CIPHER_CTX structure. The actual NID value is an internal value which may not have a corresponding OBJECT IDENTIFIER.
 int EVP_CIPHER_nid(const EVP_CIPHER *cipher)
 {
     return cipher->nid;
@@ -300,6 +311,7 @@ int EVP_MD_block_size(const EVP_MD *md)
     return md->block_size;
 }
 
+//EVP_MD_type() and EVP_MD_CTX_type() return the NID of the OBJECT IDENTIFIER representing the given message digest when passed an EVP_MD structure. For example EVP_MD_type(EVP_sha1()) returns NID_sha1. This function is normally used when setting ASN1 OIDs.
 int EVP_MD_type(const EVP_MD *md)
 {
     return md->type;
@@ -310,6 +322,7 @@ int EVP_MD_pkey_type(const EVP_MD *md)
     return md->pkey_type;
 }
 
+//EVP_MD_size() and EVP_MD_CTX_size() return the size of the message digest when passed an EVP_MD or an EVP_MD_CTX structure, i.e. the size of the hash.
 int EVP_MD_size(const EVP_MD *md)
 {
     if (!md) {

@@ -354,33 +354,28 @@ static int state_machine(SSL *s, int server)
         if (SSL_IS_DTLS(s)) {
             if ((s->version & 0xff00) != (DTLS1_VERSION & 0xff00) &&
                 (server || (s->version & 0xff00) != (DTLS1_BAD_VER & 0xff00))) {
-                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
                 goto end;
             }
         } else {
             if ((s->version >> 8) != SSL3_VERSION_MAJOR) {
-                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
                 goto end;
             }
         }
 
         if (!ssl_security(s, SSL_SECOP_VERSION, 0, s->version, NULL)) {
-            SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                     ERR_R_INTERNAL_ERROR);
+            SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
             goto end;
         }
 
         if (s->init_buf == NULL) {
             if ((buf = BUF_MEM_new()) == NULL) {
-                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
                 goto end;
             }
             if (!BUF_MEM_grow(buf, SSL3_RT_MAX_PLAIN_LENGTH)) {
-                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
                 goto end;
             }
             s->init_buf = buf;
@@ -388,8 +383,7 @@ static int state_machine(SSL *s, int server)
         }
 
         if (!ssl3_setup_buffers(s)) {
-            SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE,
-                     ERR_R_INTERNAL_ERROR);
+            SSLfatal(s, SSL_AD_NO_ALERT, SSL_F_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
             goto end;
         }
         s->init_num = 0;
@@ -467,8 +461,7 @@ static int state_machine(SSL *s, int server)
          * Notify SCTP BIO socket to leave handshake mode and allow stream
          * identifier other than 0.
          */
-        BIO_ctrl(SSL_get_wbio(s), BIO_CTRL_DGRAM_SCTP_SET_IN_HANDSHAKE,
-                 st->in_handshake, NULL);
+        BIO_ctrl(SSL_get_wbio(s), BIO_CTRL_DGRAM_SCTP_SET_IN_HANDSHAKE, st->in_handshake, NULL);
     }
 #endif
 
@@ -697,8 +690,7 @@ static int statem_do_write(SSL *s)
 {
     OSSL_STATEM *st = &s->statem;
 
-    if (st->hand_state == TLS_ST_CW_CHANGE
-        || st->hand_state == TLS_ST_SW_CHANGE) {
+    if (st->hand_state == TLS_ST_CW_CHANGE || st->hand_state == TLS_ST_SW_CHANGE) {
         if (SSL_IS_DTLS(s))
             return dtls1_do_write(s, SSL3_RT_CHANGE_CIPHER_SPEC);
         else
@@ -843,11 +835,9 @@ static SUB_STATE_RETURN write_state_machine(SSL *s)
                 check_fatal(s, SSL_F_WRITE_STATE_MACHINE);
                 return SUB_STATE_ERROR;
             }
-            if (!ssl_close_construct_packet(s, &pkt, mt)
-                    || !WPACKET_finish(&pkt)) {
+            if (!ssl_close_construct_packet(s, &pkt, mt) || !WPACKET_finish(&pkt)) {
                 WPACKET_cleanup(&pkt);
-                SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_WRITE_STATE_MACHINE,
-                         ERR_R_INTERNAL_ERROR);
+                SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_WRITE_STATE_MACHINE, ERR_R_INTERNAL_ERROR);
                 return SUB_STATE_ERROR;
             }
 

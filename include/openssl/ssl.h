@@ -1261,6 +1261,8 @@ DECLARE_PEM_rw(SSL_SESSION, SSL_SESSION)
         SSL_ctrl((ssl),SSL_CTRL_CLEAR_NUM_RENEGOTIATIONS,0,NULL)
 # define SSL_total_renegotiations(ssl) \
         SSL_ctrl((ssl),SSL_CTRL_GET_TOTAL_RENEGOTIATIONS,0,NULL)
+//Sets DH parameters to be used to be dh. The key is inherited by all ssl objects created from ctx.
+//This function apply to SSL/TLS servers only.
 # define SSL_CTX_set_tmp_dh(ctx,dh) \
         SSL_CTX_ctrl(ctx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
 # define SSL_CTX_set_tmp_ecdh(ctx,ecdh) \
@@ -1269,17 +1271,24 @@ DECLARE_PEM_rw(SSL_SESSION, SSL_SESSION)
         SSL_CTX_ctrl(ctx,SSL_CTRL_SET_DH_AUTO,onoff,NULL)
 # define SSL_set_dh_auto(s, onoff) \
         SSL_ctrl(s,SSL_CTRL_SET_DH_AUTO,onoff,NULL)
+//Sets the parameters only for ssl.
+//This function apply to SSL/TLS servers only.
 # define SSL_set_tmp_dh(ssl,dh) \
         SSL_ctrl(ssl,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
 # define SSL_set_tmp_ecdh(ssl,ecdh) \
         SSL_ctrl(ssl,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
 //Add the rest of the certificates needed to form the complete certificate chain 
+//Adds the certificate x509 to the extra chain certificates associated with ctx. 
+//Several certificates can be added one after another.
+//The x509 certificate provided to SSL_CTX_add_extra_chain_cert() will be freed by the library when the SSL_CTX is destroyed. An application should not free the x509 object.
+//Only one set of extra chain certificates can be specified per SSL_CTX structure. Different chains for different certificates (for example if both RSA and DSA certificates are specified by the same server) or different SSL structures with the same parent SSL_CTX cannot be specified using this function.
 # define SSL_CTX_add_extra_chain_cert(ctx,x509) \
         SSL_CTX_ctrl(ctx,SSL_CTRL_EXTRA_CHAIN_CERT,0,(char *)(x509))
 # define SSL_CTX_get_extra_chain_certs(ctx,px509) \
         SSL_CTX_ctrl(ctx,SSL_CTRL_GET_EXTRA_CHAIN_CERTS,0,px509)
 # define SSL_CTX_get_extra_chain_certs_only(ctx,px509) \
         SSL_CTX_ctrl(ctx,SSL_CTRL_GET_EXTRA_CHAIN_CERTS,1,px509)
+//Clears all extra chain certificates associated with ctx.
 # define SSL_CTX_clear_extra_chain_certs(ctx) \
         SSL_CTX_ctrl(ctx,SSL_CTRL_CLEAR_EXTRA_CHAIN_CERTS,0,NULL)
 # define SSL_CTX_set0_chain(ctx,sk) \
@@ -1989,12 +1998,8 @@ void SSL_set_default_read_buffer_len(SSL *s, size_t len);
 
 # ifndef OPENSSL_NO_DH
 /* NB: the |keylength| is only applicable when is_export is true */
-void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx,
-                                 DH *(*dh) (SSL *ssl, int is_export,
-                                            int keylength));
-void SSL_set_tmp_dh_callback(SSL *ssl,
-                             DH *(*dh) (SSL *ssl, int is_export,
-                                        int keylength));
+void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh) (SSL *ssl, int is_export, int keylength));
+void SSL_set_tmp_dh_callback(SSL *ssl, DH *(*dh) (SSL *ssl, int is_export, int keylength));
 # endif
 
 __owur const COMP_METHOD *SSL_get_current_compression(SSL *s);

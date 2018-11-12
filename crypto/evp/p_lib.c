@@ -33,6 +33,7 @@ int EVP_PKEY_bits(const EVP_PKEY *pkey)
     return 0;
 }
 
+//Returns the number of security bits of the given pkey, bits of security is defined in NIST SP800-57.
 int EVP_PKEY_security_bits(const EVP_PKEY *pkey)
 {
     if (pkey == NULL)
