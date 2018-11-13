@@ -24,19 +24,19 @@ static int mem_buf_free(BIO *data, int free_all);
 static int mem_buf_sync(BIO *h);
 
 static const BIO_METHOD mem_method = {
-    BIO_TYPE_MEM,
-    "memory buffer",
+    BIO_TYPE_MEM,		//type
+    "memory buffer",	//name
     /* TODO: Convert to new style write function */
-    bwrite_conv,
-    mem_write,
+    bwrite_conv,		//bwrite
+    mem_write,			//bwrite_old
     /* TODO: Convert to new style read function */
-    bread_conv,
-    mem_read,
-    mem_puts,
-    mem_gets,
-    mem_ctrl,
-    mem_new,
-    mem_free,
+    bread_conv,			//bread
+    mem_read,			//bread_old
+    mem_puts,			//bputs
+    mem_gets,			//bgets
+    mem_ctrl,			//ctrl
+    mem_new,			//create
+    mem_free,			//destroy
     NULL,                      /* mem_callback_ctrl */
 };
 

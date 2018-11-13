@@ -179,8 +179,7 @@ int CRYPTO_free_ex_index(int class_index, int idx);	/* No longer use an index. *
  * given class (invokes whatever per-class callbacks are applicable)
  */
 int CRYPTO_new_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad);
-int CRYPTO_dup_ex_data(int class_index, CRYPTO_EX_DATA *to,
-                       const CRYPTO_EX_DATA *from);
+int CRYPTO_dup_ex_data(int class_index, CRYPTO_EX_DATA *to, const CRYPTO_EX_DATA *from);
 
 void CRYPTO_free_ex_data(int class_index, void *obj, CRYPTO_EX_DATA *ad);
 

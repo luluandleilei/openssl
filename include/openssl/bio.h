@@ -182,19 +182,14 @@ void BIO_set_flags(BIO *b, int flags);
 int BIO_test_flags(const BIO *b, int flags);
 void BIO_clear_flags(BIO *b, int flags);
 
-# define BIO_get_flags(b) BIO_test_flags(b, ~(0x0))
-# define BIO_set_retry_special(b) \
-                BIO_set_flags(b, (BIO_FLAGS_IO_SPECIAL|BIO_FLAGS_SHOULD_RETRY))
-# define BIO_set_retry_read(b) \
-                BIO_set_flags(b, (BIO_FLAGS_READ|BIO_FLAGS_SHOULD_RETRY))
-# define BIO_set_retry_write(b) \
-                BIO_set_flags(b, (BIO_FLAGS_WRITE|BIO_FLAGS_SHOULD_RETRY))
+# define BIO_get_flags(b) 			BIO_test_flags(b, ~(0x0))
+# define BIO_set_retry_special(b)  	BIO_set_flags(b, (BIO_FLAGS_IO_SPECIAL|BIO_FLAGS_SHOULD_RETRY))
+# define BIO_set_retry_read(b) 		BIO_set_flags(b, (BIO_FLAGS_READ|BIO_FLAGS_SHOULD_RETRY))
+# define BIO_set_retry_write(b)  	BIO_set_flags(b, (BIO_FLAGS_WRITE|BIO_FLAGS_SHOULD_RETRY))
 
 /* These are normally used internally in BIOs */
-# define BIO_clear_retry_flags(b) \
-                BIO_clear_flags(b, (BIO_FLAGS_RWS|BIO_FLAGS_SHOULD_RETRY))
-# define BIO_get_retry_flags(b) \
-                BIO_test_flags(b, (BIO_FLAGS_RWS|BIO_FLAGS_SHOULD_RETRY))
+# define BIO_clear_retry_flags(b)  	BIO_clear_flags(b, (BIO_FLAGS_RWS|BIO_FLAGS_SHOULD_RETRY))
+# define BIO_get_retry_flags(b)  	BIO_test_flags(b, (BIO_FLAGS_RWS|BIO_FLAGS_SHOULD_RETRY))
 
 /* These should be used by the application to tell why we should retry */
 # define BIO_should_read(a)              BIO_test_flags(a, BIO_FLAGS_READ)
@@ -236,11 +231,8 @@ void BIO_clear_flags(BIO *b, int flags);
 # define BIO_cb_pre(a)   (!((a)&BIO_CB_RETURN))
 # define BIO_cb_post(a)  ((a)&BIO_CB_RETURN)
 
-typedef long (*BIO_callback_fn)(BIO *b, int oper, const char *argp, int argi,
-                                long argl, long ret);
-typedef long (*BIO_callback_fn_ex)(BIO *b, int oper, const char *argp,
-                                   size_t len, int argi,
-                                   long argl, int ret, size_t *processed);
+typedef long (*BIO_callback_fn)(BIO *b, int oper, const char *argp, int argi, long argl, long ret);
+typedef long (*BIO_callback_fn_ex)(BIO *b, int oper, const char *argp, size_t len, int argi, long argl, int ret, size_t *processed);
 BIO_callback_fn BIO_get_callback(const BIO *b);
 void BIO_set_callback(BIO *b, BIO_callback_fn callback);
 
@@ -434,15 +426,11 @@ struct bio_dgram_sctp_prinfo {
  */
 int BIO_read_filename(BIO *b, const char *name);
 # else
-#  define BIO_read_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, \
-                BIO_CLOSE|BIO_FP_READ,(char *)(name))
+#  define BIO_read_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
 # endif
-# define BIO_write_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, \
-                BIO_CLOSE|BIO_FP_WRITE,name)
-# define BIO_append_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, \
-                BIO_CLOSE|BIO_FP_APPEND,name)
-# define BIO_rw_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, \
-                BIO_CLOSE|BIO_FP_READ|BIO_FP_WRITE,name)
+# define BIO_write_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_WRITE,name)
+# define BIO_append_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_APPEND,name)
+# define BIO_rw_filename(b,name) (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ|BIO_FP_WRITE,name)
 
 /*
  * WARNING WARNING, this ups the reference count on the read bio of the SSL
@@ -453,22 +441,17 @@ int BIO_read_filename(BIO *b, const char *name);
 # define BIO_set_ssl(b,ssl,c)    BIO_ctrl(b,BIO_C_SET_SSL,c,(char *)(ssl))
 # define BIO_get_ssl(b,sslp)     BIO_ctrl(b,BIO_C_GET_SSL,0,(char *)(sslp))
 # define BIO_set_ssl_mode(b,client)      BIO_ctrl(b,BIO_C_SSL_MODE,client,NULL)
-# define BIO_set_ssl_renegotiate_bytes(b,num) \
-        BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_BYTES,num,NULL)
-# define BIO_get_num_renegotiates(b) \
-        BIO_ctrl(b,BIO_C_GET_SSL_NUM_RENEGOTIATES,0,NULL)
-# define BIO_set_ssl_renegotiate_timeout(b,seconds) \
-        BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT,seconds,NULL)
+# define BIO_set_ssl_renegotiate_bytes(b,num) 	BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_BYTES,num,NULL)
+# define BIO_get_num_renegotiates(b)  BIO_ctrl(b,BIO_C_GET_SSL_NUM_RENEGOTIATES,0,NULL)
+# define BIO_set_ssl_renegotiate_timeout(b,seconds)  BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT,seconds,NULL)
 
 /* defined in evp.h */
 /* #define BIO_set_md(b,md)     BIO_ctrl(b,BIO_C_SET_MD,1,(char *)(md)) */
 
 # define BIO_get_mem_data(b,pp)  BIO_ctrl(b,BIO_CTRL_INFO,0,(char *)(pp))
 # define BIO_set_mem_buf(b,bm,c) BIO_ctrl(b,BIO_C_SET_BUF_MEM,c,(char *)(bm))
-# define BIO_get_mem_ptr(b,pp)   BIO_ctrl(b,BIO_C_GET_BUF_MEM_PTR,0, \
-                                          (char *)(pp))
-# define BIO_set_mem_eof_return(b,v) \
-                                BIO_ctrl(b,BIO_C_SET_BUF_MEM_EOF_RETURN,v,NULL)
+# define BIO_get_mem_ptr(b,pp)   BIO_ctrl(b,BIO_C_GET_BUF_MEM_PTR,0,  (char *)(pp))
+# define BIO_set_mem_eof_return(b,v)  BIO_ctrl(b,BIO_C_SET_BUF_MEM_EOF_RETURN,v,NULL)
 
 /* For the BIO_f_buffer() type */
 # define BIO_get_buffer_num_lines(b)     BIO_ctrl(b,BIO_C_GET_BUFF_NUM_LINES,0,NULL)
@@ -490,8 +473,7 @@ int BIO_read_filename(BIO *b, const char *name);
 size_t BIO_ctrl_pending(BIO *b);
 size_t BIO_ctrl_wpending(BIO *b);
 # define BIO_flush(b)            (int)BIO_ctrl(b,BIO_CTRL_FLUSH,0,NULL)
-# define BIO_get_info_callback(b,cbp) (int)BIO_ctrl(b,BIO_CTRL_GET_CALLBACK,0, \
-                                                   cbp)
+# define BIO_get_info_callback(b,cbp) (int)BIO_ctrl(b,BIO_CTRL_GET_CALLBACK,0,  cbp)
 # define BIO_set_info_callback(b,cb) (int)BIO_callback_ctrl(b,BIO_CTRL_SET_CALLBACK,cb)
 
 /* For the BIO_f_buffer() type */
@@ -767,36 +749,25 @@ ossl_bio__attr__((__format__(ossl_bio__printf__, 3, 0)));
 BIO_METHOD *BIO_meth_new(int type, const char *name);
 void BIO_meth_free(BIO_METHOD *biom);
 int (*BIO_meth_get_write(const BIO_METHOD *biom)) (BIO *, const char *, int);
-int (*BIO_meth_get_write_ex(const BIO_METHOD *biom)) (BIO *, const char *, size_t,
-                                                size_t *);
-int BIO_meth_set_write(BIO_METHOD *biom,
-                       int (*write) (BIO *, const char *, int));
-int BIO_meth_set_write_ex(BIO_METHOD *biom,
-                       int (*bwrite) (BIO *, const char *, size_t, size_t *));
+int (*BIO_meth_get_write_ex(const BIO_METHOD *biom)) (BIO *, const char *, size_t, size_t *);
+int BIO_meth_set_write(BIO_METHOD *biom, int (*write) (BIO *, const char *, int));
+int BIO_meth_set_write_ex(BIO_METHOD *biom, int (*bwrite) (BIO *, const char *, size_t, size_t *));
 int (*BIO_meth_get_read(const BIO_METHOD *biom)) (BIO *, char *, int);
 int (*BIO_meth_get_read_ex(const BIO_METHOD *biom)) (BIO *, char *, size_t, size_t *);
-int BIO_meth_set_read(BIO_METHOD *biom,
-                      int (*read) (BIO *, char *, int));
-int BIO_meth_set_read_ex(BIO_METHOD *biom,
-                         int (*bread) (BIO *, char *, size_t, size_t *));
+int BIO_meth_set_read(BIO_METHOD *biom, int (*read) (BIO *, char *, int));
+int BIO_meth_set_read_ex(BIO_METHOD *biom, int (*bread) (BIO *, char *, size_t, size_t *));
 int (*BIO_meth_get_puts(const BIO_METHOD *biom)) (BIO *, const char *);
-int BIO_meth_set_puts(BIO_METHOD *biom,
-                      int (*puts) (BIO *, const char *));
+int BIO_meth_set_puts(BIO_METHOD *biom, int (*puts) (BIO *, const char *));
 int (*BIO_meth_get_gets(const BIO_METHOD *biom)) (BIO *, char *, int);
-int BIO_meth_set_gets(BIO_METHOD *biom,
-                      int (*gets) (BIO *, char *, int));
+int BIO_meth_set_gets(BIO_METHOD *biom, int (*gets) (BIO *, char *, int));
 long (*BIO_meth_get_ctrl(const BIO_METHOD *biom)) (BIO *, int, long, void *);
-int BIO_meth_set_ctrl(BIO_METHOD *biom,
-                      long (*ctrl) (BIO *, int, long, void *));
+int BIO_meth_set_ctrl(BIO_METHOD *biom, long (*ctrl) (BIO *, int, long, void *));
 int (*BIO_meth_get_create(const BIO_METHOD *bion)) (BIO *);
 int BIO_meth_set_create(BIO_METHOD *biom, int (*create) (BIO *));
 int (*BIO_meth_get_destroy(const BIO_METHOD *biom)) (BIO *);
 int BIO_meth_set_destroy(BIO_METHOD *biom, int (*destroy) (BIO *));
-long (*BIO_meth_get_callback_ctrl(const BIO_METHOD *biom))
-                                 (BIO *, int, BIO_info_cb *);
-int BIO_meth_set_callback_ctrl(BIO_METHOD *biom,
-                               long (*callback_ctrl) (BIO *, int,
-                                                      BIO_info_cb *));
+long (*BIO_meth_get_callback_ctrl(const BIO_METHOD *biom)) (BIO *, int, BIO_info_cb *);
+int BIO_meth_set_callback_ctrl(BIO_METHOD *biom, long (*callback_ctrl) (BIO *, int, BIO_info_cb *));
 
 # ifdef  __cplusplus
 }

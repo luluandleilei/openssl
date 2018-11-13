@@ -33,12 +33,14 @@ int BIO_get_new_index(void)
     return newval;
 }
 
+//Creates a new BIO_METHOD structure. 
+//It should be given a unique integer type and a string that represents its name. 
+//Use BIO_get_new_index() to get the value for type.
 BIO_METHOD *BIO_meth_new(int type, const char *name)
 {
     BIO_METHOD *biom = OPENSSL_zalloc(sizeof(BIO_METHOD));
 
-    if (biom == NULL
-            || (biom->name = OPENSSL_strdup(name)) == NULL) {
+    if (biom == NULL || (biom->name = OPENSSL_strdup(name)) == NULL) {
         OPENSSL_free(biom);
         BIOerr(BIO_F_BIO_METH_NEW, ERR_R_MALLOC_FAILURE);
         return NULL;
@@ -47,6 +49,7 @@ BIO_METHOD *BIO_meth_new(int type, const char *name)
     return biom;
 }
 
+//Destroys a BIO_METHOD structure and frees up any memory associated with it.
 void BIO_meth_free(BIO_METHOD *biom)
 {
     if (biom != NULL) {
@@ -60,8 +63,7 @@ int (*BIO_meth_get_write(const BIO_METHOD *biom)) (BIO *, const char *, int)
     return biom->bwrite_old;
 }
 
-int (*BIO_meth_get_write_ex(const BIO_METHOD *biom)) (BIO *, const char *, size_t,
-                                                size_t *)
+int (*BIO_meth_get_write_ex(const BIO_METHOD *biom)) (BIO *, const char *, size_t, size_t *)
 {
     return biom->bwrite;
 }
@@ -86,16 +88,14 @@ int bwrite_conv(BIO *bio, const char *data, size_t datal, size_t *written)
     return 1;
 }
 
-int BIO_meth_set_write(BIO_METHOD *biom,
-                       int (*bwrite) (BIO *, const char *, int))
+int BIO_meth_set_write(BIO_METHOD *biom, int (*bwrite) (BIO *, const char *, int))
 {
     biom->bwrite_old = bwrite;
     biom->bwrite = bwrite_conv;
     return 1;
 }
 
-int BIO_meth_set_write_ex(BIO_METHOD *biom,
-                       int (*bwrite) (BIO *, const char *, size_t, size_t *))
+int BIO_meth_set_write_ex(BIO_METHOD *biom, int (*bwrite) (BIO *, const char *, size_t, size_t *))
 {
     biom->bwrite_old = NULL;
     biom->bwrite = bwrite;

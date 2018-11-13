@@ -68,6 +68,8 @@ static long bio_call_callback(BIO *b, int oper, const char *argp, size_t len,
     return ret;
 }
 
+//Create a new BIO using method type.
+//returns a newly created BIO or NULL if the call fails.
 BIO *BIO_new(const BIO_METHOD *method)
 {
     BIO *bio = OPENSSL_zalloc(sizeof(*bio));
@@ -107,6 +109,11 @@ err:
     return NULL;
 }
 
+//Frees up a single BIO. If 'a' is NULL nothing is done. 
+//Calling BIO_free() may also have some effect on the underlying I/O structure, 
+//	for example it may close the file being referred to under certain circumstances. 
+//For more details see the individual BIO_METHOD descriptions.
+//Return 1 for success and 0 for failure.
 int BIO_free(BIO *a)
 {
     int ret;
@@ -170,11 +177,14 @@ int BIO_get_shutdown(BIO *a)
     return a->shutdown;
 }
 
+//Frees up a single BIO but it does not return a value. 
 void BIO_vfree(BIO *a)
 {
     BIO_free(a);
 }
 
+//Increments the reference count associated with the BIO object.
+//return 1 for success and 0 for failure.
 int BIO_up_ref(BIO *a)
 {
     int i;
@@ -237,6 +247,7 @@ const char *BIO_method_name(const BIO *b)
     return b->method->name;
 }
 
+//Returns the type of a BIO.
 int BIO_method_type(const BIO *b)
 {
     return b->method->type;
@@ -258,8 +269,7 @@ static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
     }
 
     if ((b->callback != NULL || b->callback_ex != NULL) &&
-        ((ret = (int)bio_call_callback(b, BIO_CB_READ, data, dlen, 0, 0L, 1L,
-                                       NULL)) <= 0))
+        ((ret = (int)bio_call_callback(b, BIO_CB_READ, data, dlen, 0, 0L, 1L, NULL)) <= 0))
         return ret;
 
     if (!b->init) {
@@ -273,8 +283,7 @@ static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
         b->num_read += (uint64_t)*readbytes;
 
     if (b->callback != NULL || b->callback_ex != NULL)
-        ret = (int)bio_call_callback(b, BIO_CB_READ | BIO_CB_RETURN, data,
-                                     dlen, 0, 0L, ret, readbytes);
+        ret = (int)bio_call_callback(b, BIO_CB_READ | BIO_CB_RETURN, data, dlen, 0, 0L, ret, readbytes);
 
     /* Shouldn't happen */
     if (ret > 0 && *readbytes > dlen) {
@@ -285,6 +294,7 @@ static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
     return ret;
 }
 
+//Attempts to read 'dlen' bytes from BIO 'b' and places the data in 'data'.
 int BIO_read(BIO *b, void *data, int dlen)
 {
     size_t readbytes;
@@ -317,8 +327,7 @@ int BIO_read_ex(BIO *b, void *data, size_t dlen, size_t *readbytes)
     return ret;
 }
 
-static int bio_write_intern(BIO *b, const void *data, size_t dlen,
-                            size_t *written)
+static int bio_write_intern(BIO *b, const void *data, size_t dlen, size_t *written)
 {
     int ret;
 
@@ -331,8 +340,7 @@ static int bio_write_intern(BIO *b, const void *data, size_t dlen,
     }
 
     if ((b->callback != NULL || b->callback_ex != NULL) &&
-        ((ret = (int)bio_call_callback(b, BIO_CB_WRITE, data, dlen, 0, 0L, 1L,
-                                       NULL)) <= 0))
+        ((ret = (int)bio_call_callback(b, BIO_CB_WRITE, data, dlen, 0, 0L, 1L, NULL)) <= 0))
         return ret;
 
     if (!b->init) {
@@ -346,12 +354,12 @@ static int bio_write_intern(BIO *b, const void *data, size_t dlen,
         b->num_write += (uint64_t)*written;
 
     if (b->callback != NULL || b->callback_ex != NULL)
-        ret = (int)bio_call_callback(b, BIO_CB_WRITE | BIO_CB_RETURN, data,
-                                     dlen, 0, 0L, ret, written);
+        ret = (int)bio_call_callback(b, BIO_CB_WRITE | BIO_CB_RETURN, data, dlen, 0, 0L, ret, written);
 
     return ret;
 }
 
+//Attempts to write 'dlen' bytes from 'data' to BIO b.
 int BIO_write(BIO *b, const void *data, int dlen)
 {
     size_t written;
@@ -384,6 +392,7 @@ int BIO_write_ex(BIO *b, const void *data, size_t dlen, size_t *written)
     return ret;
 }
 
+//Attempts to write a NUL-terminated string 'buf' to BIO 'b'.
 int BIO_puts(BIO *b, const char *buf)
 {
     int ret;
@@ -414,8 +423,7 @@ int BIO_puts(BIO *b, const char *buf)
     }
 
     if (b->callback != NULL || b->callback_ex != NULL)
-        ret = (int)bio_call_callback(b, BIO_CB_PUTS | BIO_CB_RETURN, buf, 0, 0,
-                                     0L, ret, &written);
+        ret = (int)bio_call_callback(b, BIO_CB_PUTS | BIO_CB_RETURN, buf, 0, 0, 0L, ret, &written);
 
     if (ret > 0) {
         if (written > INT_MAX) {
@@ -429,6 +437,12 @@ int BIO_puts(BIO *b, const char *buf)
     return ret;
 }
 
+//Performs the BIOs "gets" operation and places the data in buf. 
+//Usually this operation will attempt to read a line of data from the BIO of maximum length 'len'-1. 
+//There are exceptions to this, however; for example, BIO_gets() on a digest BIO will calculate and
+//	return the digest and other BIOs may not support BIO_gets() at all. 
+//The returned string is always NUL-terminated.
+//The trailing NUL is not included in the length returned by BIO_gets()
 int BIO_gets(BIO *b, char *buf, int size)
 {
     int ret;
@@ -463,8 +477,7 @@ int BIO_gets(BIO *b, char *buf, int size)
     }
 
     if (b->callback != NULL || b->callback_ex != NULL)
-        ret = (int)bio_call_callback(b, BIO_CB_GETS | BIO_CB_RETURN, buf, size,
-                                     0, 0L, ret, &readbytes);
+        ret = (int)bio_call_callback(b, BIO_CB_GETS | BIO_CB_RETURN, buf, size, 0, 0L, ret, &readbytes);
 
     if (ret > 0) {
         /* Shouldn't happen */
@@ -528,8 +541,7 @@ long BIO_ctrl(BIO *b, int cmd, long larg, void *parg)
     ret = b->method->ctrl(b, cmd, larg, parg);
 
     if (b->callback != NULL || b->callback_ex != NULL)
-        ret = bio_call_callback(b, BIO_CB_CTRL | BIO_CB_RETURN, parg, 0, cmd,
-                                larg, ret, NULL);
+        ret = bio_call_callback(b, BIO_CB_CTRL | BIO_CB_RETURN, parg, 0, cmd, larg, ret, NULL);
 
     return ret;
 }
@@ -645,6 +657,11 @@ void BIO_set_retry_reason(BIO *bio, int reason)
     bio->retry_reason = reason;
 }
 
+//Searches for a BIO of a given type in a chain, starting at BIO 'bio'. 
+//If 'type' is a specific type (such as BIO_TYPE_MEM) then a search is made for a BIO of that type.
+//If 'type' is a general type (such as BIO_TYPE_SOURCE_SINK) then the next matching BIO of the given general type is searched for.
+//BIO_find_type() returns the next matching BIO or NULL if none is found.
+//Returns a matching BIO or NULL for no match.
 BIO *BIO_find_type(BIO *bio, int type)
 {
     int mt, mask;
@@ -667,6 +684,8 @@ BIO *BIO_find_type(BIO *bio, int type)
     return NULL;
 }
 
+//Returns the next BIO in a chain. 
+//It can be used to traverse all BIOs in a chain or used in conjunction with BIO_find_type() to find all BIOs of a certain type.
 BIO *BIO_next(BIO *b)
 {
     if (b == NULL)
@@ -679,6 +698,8 @@ void BIO_set_next(BIO *b, BIO *next)
     b->next_bio = next;
 }
 
+//Frees up an entire BIO chain, it does not halt if an error occurs freeing up an individual BIO in the chain.
+//If 'bio' is NULL nothing is done.
 void BIO_free_all(BIO *bio)
 {
     BIO *b;

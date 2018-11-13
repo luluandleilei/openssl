@@ -13,7 +13,7 @@ struct bio_method_st {
     int type;
     char *name;
     int (*bwrite) (BIO *, const char *, size_t, size_t *);
-    int (*bwrite_old) (BIO *, const char *, int);
+    int (*bwrite_old) (BIO *, const char *, int);		
     int (*bread) (BIO *, char *, size_t, size_t *);
     int (*bread_old) (BIO *, char *, int);
     int (*bputs) (BIO *, const char *);
