@@ -384,8 +384,7 @@ struct bio_dgram_sctp_prinfo {
 #  define BIO_get_peer_port(b)          ((const char *)BIO_ptr_ctrl(b,BIO_C_GET_ACCEPT,3))
 /* #define BIO_set_nbio(b,n)    BIO_ctrl(b,BIO_C_SET_NBIO,(n),NULL) */
 #  define BIO_set_nbio_accept(b,n)      BIO_ctrl(b,BIO_C_SET_ACCEPT,2,(n)?(void *)"a":NULL)
-#  define BIO_set_accept_bios(b,bio)    BIO_ctrl(b,BIO_C_SET_ACCEPT,3, \
-                                                 (char *)(bio))
+#  define BIO_set_accept_bios(b,bio)    BIO_ctrl(b,BIO_C_SET_ACCEPT,3, (char *)(bio))
 #  define BIO_set_accept_ip_family(b,f) BIO_int_ctrl(b,BIO_C_SET_ACCEPT,4,f)
 #  define BIO_get_accept_ip_family(b)   BIO_ctrl(b,BIO_C_GET_ACCEPT,4,NULL)
 
@@ -401,6 +400,12 @@ struct bio_dgram_sctp_prinfo {
 #  define BIO_do_accept(b)        BIO_do_handshake(b)
 # endif /* OPENSSL_NO_SOCK */
 
+//Attempts to complete an SSL handshake on the supplied BIO and establish the SSL connection. 
+//It returns 1 if the connection was established successfully. 
+//A zero or negative value is returned if the connection could not be established, 
+//the call BIO_should_retry() should be used for non blocking connect BIOs to determine if the call should be retried. 
+//If an SSL connection has already been established this call has no effect.
+//Applications do not have to call BIO_do_handshake() but may wish to do so to separate the handshake process from other I/O processing.
 # define BIO_do_handshake(b)     BIO_ctrl(b,BIO_C_DO_STATE_MACHINE,0,NULL)
 
 /* BIO_s_datagram(), BIO_s_fd(), BIO_s_socket(), BIO_s_accept() and BIO_s_connect() */
@@ -438,11 +443,21 @@ int BIO_read_filename(BIO *b, const char *name);
  * next_bio field in the bio.  So when you free the BIO, make sure you are
  * doing a BIO_free_all() to catch the underlying BIO.
  */
+//Sets the internal SSL pointer of BIO b to ssl using the close flag c.
+//If the close flag is set when an SSL BIO is freed then the internal SSL structure is also freed using SSL_free().
 # define BIO_set_ssl(b,ssl,c)    BIO_ctrl(b,BIO_C_SET_SSL,c,(char *)(ssl))
+//Retrieves the SSL pointer of BIO b, it can then be manipulated using the standard SSL library functions.
 # define BIO_get_ssl(b,sslp)     BIO_ctrl(b,BIO_C_GET_SSL,0,(char *)(sslp))
+//Sets the SSL BIO mode to client. If client is 1 client mode is set. If client is 0 server mode is set.
 # define BIO_set_ssl_mode(b,client)      BIO_ctrl(b,BIO_C_SSL_MODE,client,NULL)
+//Sets the renegotiate byte count to num. 
+//When set after every num bytes of I/O (read and write) the SSL session is automatically renegotiated. 
+//num must be at least 512 bytes.
 # define BIO_set_ssl_renegotiate_bytes(b,num) 	BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_BYTES,num,NULL)
+//Returns the total number of session renegotiations due to I/O or timeout.
 # define BIO_get_num_renegotiates(b)  BIO_ctrl(b,BIO_C_GET_SSL_NUM_RENEGOTIATES,0,NULL)
+//Sets the renegotiate timeout to seconds. 
+//When the renegotiate timeout elapses the session is automatically renegotiated.
 # define BIO_set_ssl_renegotiate_timeout(b,seconds)  BIO_ctrl(b,BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT,seconds,NULL)
 
 /* defined in evp.h */

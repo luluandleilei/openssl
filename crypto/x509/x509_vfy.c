@@ -2046,6 +2046,7 @@ void X509_STORE_CTX_set_error_depth(X509_STORE_CTX *ctx, int depth)
     ctx->error_depth = depth;
 }
 
+//Returns the certificate in 'ctx' which caused the error or NULL if no certificate is relevant.
 X509 *X509_STORE_CTX_get_current_cert(X509_STORE_CTX *ctx)
 {
     return ctx->current_cert;

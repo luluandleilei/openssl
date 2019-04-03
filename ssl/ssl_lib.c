@@ -1219,12 +1219,20 @@ void SSL_free(SSL *s)
     OPENSSL_free(s);
 }
 
+//connects the BIO rbio for the read operations of the ssl object. 
+//The SSL engine inherits the behaviour of rbio. If the BIO is non-blocking then the ssl object will also have non-blocking behaviour. 
+//This function transfers ownership of rbio to ssl. It will be automatically freed using BIO_free_all() when the ssl is freed. 
+//On calling this function, any existing rbio that was previously set will also be freed via a call to BIO_free_all() 
+//	(this includes the case where the rbio is set to the same value as previously).
 void SSL_set0_rbio(SSL *s, BIO *rbio)
 {
     BIO_free_all(s->rbio);
     s->rbio = rbio;
 }
 
+//Works in the same as SSL_set0_rbio() except that it connects the BIO wbio for the write operations of the ssl object.
+//Note that if the rbio and wbio are the same then SSL_set0_rbio() and SSL_set0_wbio() each take ownership of one reference. 
+//Therefore it may be necessary to increment the number of references available using BIO_up_ref() before calling the set0 functions.
 void SSL_set0_wbio(SSL *s, BIO *wbio)
 {
     /*
@@ -1241,6 +1249,19 @@ void SSL_set0_wbio(SSL *s, BIO *wbio)
         s->wbio = BIO_push(s->bbio, s->wbio);
 }
 
+//Does a similar job as SSL_set0_rbio() and SSL_set0_wbio() except that it connects both the rbio and the wbio at the same time. 
+//This function transfers the ownership of rbio and wbio to ssl except that the rules for this are much more complex. 
+//For this reason this function is considered a legacy function and SSL_set0_rbio() and SSL_set0_wbio() should be used in preference. 
+//The ownership rules are as follows:
+//	If neither the rbio or wbio have changed from their previous values then nothing is done.
+//	If the rbio and wbio parameters are different and both are different to their previously set values 
+//		then one reference is consumed for the rbio and one reference is consumed for the wbio.
+//	If the rbio and wbio parameters are the same and the rbio is not the same as the previously set value then one reference is consumed.
+//	If the rbio and wbio parameters are the same and the rbio is the same as the previously set value, then no additional references are consumed.
+//	If the rbio and wbio parameters are different and the rbio is the same as the previously set value 
+//		then one reference is consumed for the wbio and no references are consumed for the rbio.
+//	If the rbio and wbio parameters are different and the wbio is the same as the previously set value and the old rbio and wbio values were the same as each other then one reference is consumed for the rbio and no references are consumed for the wbio.
+//	If the rbio and wbio parameters are different and the wbio is the same as the previously set value and the old rbio and wbio values were different to each other then one reference is consumed for the rbio and one reference is consumed for the wbio.
 void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
 {
     /*
@@ -1446,8 +1467,12 @@ int (*SSL_CTX_get_verify_callback(const SSL_CTX *ctx)) (int, X509_STORE_CTX *) {
     return ctx->default_verify_callback;
 }
 
-void SSL_set_verify(SSL *s, int mode,
-                    int (*callback) (int ok, X509_STORE_CTX *ctx))
+//Sets the verification flags for 'ssl' to be 'mode' and specifies the 'verify_callback' function to be used. 
+//If no callback function shall be specified, the NULL pointer can be used for 'verify_callback'. 
+//In this case last 'verify_callback' set specifically for this 'ssl' remains. 
+//If no special 'callback' was set before, the default callback for the underlying 'ctx' is used, 
+//	that was valid at the time 'ssl' was created with SSL_new(). 
+void SSL_set_verify(SSL *s, int mode, int (*callback) (int ok, X509_STORE_CTX *ctx))
 {
     s->verify_mode = mode;
     if (callback != NULL)
@@ -3177,12 +3202,15 @@ void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb) (X509_STORE_CTX *,
     ctx->app_verify_arg = arg;
 }
 
+//Sets the verification flags for 'ctx' to be 'mode' and specifies the 'verify_callback' function to be used. 
+//If no callback function shall be specified, the NULL pointer can be used for 'verify_callback'.
 void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, int (*cb) (int, X509_STORE_CTX *))
 {
     ctx->verify_mode = mode;
     ctx->default_verify_callback = cb;
 }
 
+//Sets the maximum 'depth' for the certificate chain verification that shall be allowed for 'ctx'.
 void SSL_CTX_set_verify_depth(SSL_CTX *ctx, int depth)
 {
     X509_VERIFY_PARAM_set_depth(ctx->param, depth);

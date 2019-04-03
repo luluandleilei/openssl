@@ -123,14 +123,14 @@ struct bio_st {
     int flags;                  /* extra storage */
     int retry_reason;
     int num;
-    void *ptr;
+    void *ptr;   //XXX:某个特定类型的bio的数据
     struct bio_st *next_bio;    /* used by filter BIOs */
     struct bio_st *prev_bio;    /* used by filter BIOs */
-    CRYPTO_REF_COUNT references;
-    uint64_t num_read;
-    uint64_t num_write;
+    CRYPTO_REF_COUNT references; //此对象的引用计数
+    uint64_t num_read; //统计从此对象中读出的字节数
+    uint64_t num_write; //统计写入到此对象的字节数
     CRYPTO_EX_DATA ex_data;
-    CRYPTO_RWLOCK *lock;
+    CRYPTO_RWLOCK *lock; //用于对引用计数字段的互斥访问
 };
 
 #ifndef OPENSSL_NO_SOCK

@@ -48,6 +48,8 @@ static const BIO_METHOD methods_sslp = {
     ssl_callback_ctrl,
 };
 
+//BIO_f_ssl() returns the SSL BIO method. 
+//This is a filter BIO which is a wrapper round the OpenSSL SSL routines adding a BIO "flavour" to SSL I/O.
 const BIO_METHOD *BIO_f_ssl(void)
 {
     return &methods_sslp;
@@ -235,7 +237,7 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
     if ((ssl == NULL) && (cmd != BIO_C_SET_SSL))
         return 0;
     switch (cmd) {
-    case BIO_CTRL_RESET:
+    case BIO_CTRL_RESET: //BIO_reset
         SSL_shutdown(ssl);
 
         if (ssl->handshake_func == ssl->method->ssl_connect)
@@ -258,28 +260,28 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
     case BIO_CTRL_INFO:
         ret = 0;
         break;
-    case BIO_C_SSL_MODE:
+    case BIO_C_SSL_MODE: //BIO_set_ssl_mode()
         if (num)                /* client mode */
             SSL_set_connect_state(ssl);
         else
             SSL_set_accept_state(ssl);
         break;
-    case BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT:
+    case BIO_C_SET_SSL_RENEGOTIATE_TIMEOUT: //BIO_set_ssl_renegotiate_timeout()
         ret = bs->renegotiate_timeout;
         if (num < 60)
             num = 5;
         bs->renegotiate_timeout = (unsigned long)num;
         bs->last_time = (unsigned long)time(NULL);
         break;
-    case BIO_C_SET_SSL_RENEGOTIATE_BYTES:
+    case BIO_C_SET_SSL_RENEGOTIATE_BYTES: //BIO_set_ssl_renegotiate_bytes()
         ret = bs->renegotiate_count;
         if ((long)num >= 512)
             bs->renegotiate_count = (unsigned long)num;
         break;
-    case BIO_C_GET_SSL_NUM_RENEGOTIATES:
+    case BIO_C_GET_SSL_NUM_RENEGOTIATES: //BIO_get_num_renegotiates()
         ret = bs->num_renegotiates;
         break;
-    case BIO_C_SET_SSL:
+    case BIO_C_SET_SSL: //BIO_set_ssl()
         if (ssl != NULL) {
             ssl_free(b);
             if (!ssl_new(b))
@@ -289,15 +291,15 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
         ssl = (SSL *)ptr;
         bs->ssl = ssl;
         bio = SSL_get_rbio(ssl);
-        if (bio != NULL) {
+        if (bio != NULL) { //XXX:bio为NULL时，next忽略？
             if (next != NULL)
                 BIO_push(bio, next);
             BIO_set_next(b, bio);
-            BIO_up_ref(bio);
+            BIO_up_ref(bio); //XXX:引用计数为什么要增加
         }
         BIO_set_init(b, 1);
         break;
-    case BIO_C_GET_SSL:
+    case BIO_C_GET_SSL: //BIO_get_ssl()
         if (ptr != NULL) {
             sslp = (SSL **)ptr;
             *sslp = ssl;
@@ -323,7 +325,7 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
         ret = BIO_ctrl(ssl->wbio, cmd, num, ptr);
         BIO_copy_next_retry(b);
         break;
-    case BIO_CTRL_PUSH:
+    case BIO_CTRL_PUSH: //BIO_push
         if ((next != NULL) && (next != ssl->rbio)) {
             /*
              * We are going to pass ownership of next to the SSL object...but
@@ -340,7 +342,7 @@ static long ssl_ctrl(BIO *b, int cmd, long num, void *ptr)
             SSL_set_bio(ssl, NULL, NULL);
         }
         break;
-    case BIO_C_DO_STATE_MACHINE:
+    case BIO_C_DO_STATE_MACHINE: //BIO_do_handshake()
         BIO_clear_retry_flags(b);
 
         BIO_set_retry_reason(b, 0);
@@ -418,6 +420,7 @@ static int ssl_puts(BIO *bp, const char *str)
     return ret;
 }
 
+//Creates a new BIO chain consisting of a buffering BIO, an SSL BIO (using ctx) and a connect BIO.
 BIO *BIO_new_buffer_ssl_connect(SSL_CTX *ctx)
 {
 #ifndef OPENSSL_NO_SOCK
@@ -437,6 +440,10 @@ BIO *BIO_new_buffer_ssl_connect(SSL_CTX *ctx)
     return NULL;
 }
 
+//Creates a new BIO chain consisting of an SSL BIO (using ctx) followed by a connect BIO.
+//Since unknown BIO_ctrl() operations are sent through filter BIOs,
+//	the servers name and port can be set using BIO_set_host() on the BIO returned by BIO_new_ssl_connect() 
+//	without having to locate the connect BIO first.
 BIO *BIO_new_ssl_connect(SSL_CTX *ctx)
 {
 #ifndef OPENSSL_NO_SOCK
@@ -455,6 +462,7 @@ BIO *BIO_new_ssl_connect(SSL_CTX *ctx)
     return NULL;
 }
 
+//Allocates an SSL BIO using SSL_CTX ctx and using client mode if client is non zero.
 BIO *BIO_new_ssl(SSL_CTX *ctx, int client)
 {
     BIO *ret;
@@ -475,6 +483,8 @@ BIO *BIO_new_ssl(SSL_CTX *ctx, int client)
     return ret;
 }
 
+//Copies an SSL session id between BIO chains from and to. 
+//It does this by locating the SSL BIOs in each chain and calling SSL_copy_session_id() on the internal SSL pointer.
 int BIO_ssl_copy_session_id(BIO *t, BIO *f)
 {
     BIO_SSL *tdata, *fdata;
@@ -491,6 +501,8 @@ int BIO_ssl_copy_session_id(BIO *t, BIO *f)
     return 1;
 }
 
+//Closes down an SSL connection on BIO chain bio. 
+//It does this by locating the SSL BIO in the chain and calling SSL_shutdown() on its internal SSL pointer.
 void BIO_ssl_shutdown(BIO *b)
 {
     BIO_SSL *bdata;

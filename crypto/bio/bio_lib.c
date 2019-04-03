@@ -259,19 +259,25 @@ int BIO_method_type(const BIO *b)
  * This is for compatibility with the old style BIO_read(), where existing code
  * may make assumptions about the return value that it might get.
  */
+//返回值：
+//	成功返回值大于0
+//	失败返回值小于等于0 (不同返回值表示不同错误原因)
 static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
 {
     int ret;
 
+	//合法性检查
     if ((b == NULL) || (b->method == NULL) || (b->method->bread == NULL)) {
         BIOerr(BIO_F_BIO_READ_INTERN, BIO_R_UNSUPPORTED_METHOD);
         return -2;
     }
 
+	//若定义了call back，通知将进行read操作
     if ((b->callback != NULL || b->callback_ex != NULL) &&
         ((ret = (int)bio_call_callback(b, BIO_CB_READ, data, dlen, 0, 0L, 1L, NULL)) <= 0))
         return ret;
 
+	//检查BIO对象是否初始化
     if (!b->init) {
         BIOerr(BIO_F_BIO_READ_INTERN, BIO_R_UNINITIALIZED);
         return -2;
@@ -282,10 +288,11 @@ static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
     if (ret > 0)
         b->num_read += (uint64_t)*readbytes;
 
+	//若定义了call back，通知read操作返回
     if (b->callback != NULL || b->callback_ex != NULL)
         ret = (int)bio_call_callback(b, BIO_CB_READ | BIO_CB_RETURN, data, dlen, 0, 0L, ret, readbytes);
 
-    /* Shouldn't happen */
+    //不应该发生
     if (ret > 0 && *readbytes > dlen) {
         BIOerr(BIO_F_BIO_READ_INTERN, ERR_R_INTERNAL_ERROR);
         return -1;
@@ -295,6 +302,9 @@ static int bio_read_intern(BIO *b, void *data, size_t dlen, size_t *readbytes)
 }
 
 //Attempts to read 'dlen' bytes from BIO 'b' and places the data in 'data'.
+//返回值：
+//	成功返回读到的字节数
+//	失败返回小于或等于0（不同返回值表示不同的失败原因）
 int BIO_read(BIO *b, void *data, int dlen)
 {
     size_t readbytes;
@@ -313,6 +323,9 @@ int BIO_read(BIO *b, void *data, int dlen)
     return ret;
 }
 
+//返回值：
+//	成功返回1，readbytes表示实际读到的字节数
+//	失败返回0
 int BIO_read_ex(BIO *b, void *data, size_t dlen, size_t *readbytes)
 {
     int ret;
