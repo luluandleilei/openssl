@@ -24,7 +24,7 @@ static int ssl_set_pkey(CERT *c, EVP_PKEY *pkey);
                              | SSL_EXT_TLS1_2_SERVER_HELLO \
                              | SSL_EXT_IGNORE_ON_RESUMPTION)
 
-//Loads the certificate x into ssl
+//Loads the certificate 'x' into 'ssl'
 int SSL_use_certificate(SSL *ssl, X509 *x)
 {
     int rv;
@@ -298,8 +298,9 @@ int SSL_use_PrivateKey_ASN1(int type, SSL *ssl, const unsigned char *d,
     return ret;
 }
 
-//Loads the certificate x into ctx.
+//Loads the certificate 'x' into 'ctx'.
 //On success, the functions return 1. Otherwise check out the error stack to find out the reason.
+//The rest of the certificates needed to form the complete certificate chain can be specified using the SSL_CTX_add_extra_chain_cert() function.
 int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
 {
     int rv;
@@ -307,7 +308,7 @@ int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
         SSLerr(SSL_F_SSL_CTX_USE_CERTIFICATE, ERR_R_PASSED_NULL_PARAMETER);
         return 0;
     }
-    rv = ssl_security_cert(NULL, ctx, x, 0, 1);
+    rv = ssl_security_cert(NULL, ctx, x, 0, 1); //XXX: ?
     if (rv != 1) {
         SSLerr(SSL_F_SSL_CTX_USE_CERTIFICATE, rv);
         return 0;
@@ -375,7 +376,8 @@ static int ssl_set_cert(CERT *c, X509 *x)
     return 1;
 }
 
-//loads the first certificate stored in file into ctx. The formatting type of the certificate must be specified from the known types SSL_FILETYPE_PEM, SSL_FILETYPE_ASN1.
+//Loads the first certificate stored in 'file' into 'ctx'. 
+//The formatting 'type' of the certificate must be specified from the known types SSL_FILETYPE_PEM, SSL_FILETYPE_ASN1.
 int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
 {
     int j;
@@ -416,7 +418,7 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
     return ret;
 }
 
-//Loads the ASN1 encoded certificate from the memory location d (with length len) into ctx
+//Loads the ASN1 encoded certificate from the memory location 'd' (with length 'len') into 'ctx'
 int SSL_CTX_use_certificate_ASN1(SSL_CTX *ctx, int len, const unsigned char *d)
 {
     X509 *x;

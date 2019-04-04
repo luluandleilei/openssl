@@ -822,20 +822,16 @@ struct ssl_ctx_st {
     int (*client_cert_cb) (SSL *ssl, X509 **x509, EVP_PKEY **pkey);
 
     /* cookie generate callback */
-    int (*app_gen_cookie_cb) (SSL *ssl, unsigned char *cookie,
-                              unsigned int *cookie_len);
+    int (*app_gen_cookie_cb) (SSL *ssl, unsigned char *cookie, unsigned int *cookie_len);
 
     /* verify cookie callback */
-    int (*app_verify_cookie_cb) (SSL *ssl, const unsigned char *cookie,
-                                 unsigned int cookie_len);
+    int (*app_verify_cookie_cb) (SSL *ssl, const unsigned char *cookie, unsigned int cookie_len);
 
     /* TLS1.3 app-controlled cookie generate callback */
-    int (*gen_stateless_cookie_cb) (SSL *ssl, unsigned char *cookie,
-                                    size_t *cookie_len);
+    int (*gen_stateless_cookie_cb) (SSL *ssl, unsigned char *cookie, size_t *cookie_len);
 
     /* TLS1.3 verify app-controlled cookie callback */
-    int (*verify_stateless_cookie_cb) (SSL *ssl, const unsigned char *cookie,
-                                       size_t cookie_len);
+    int (*verify_stateless_cookie_cb) (SSL *ssl, const unsigned char *cookie, size_t cookie_len);
 
     CRYPTO_EX_DATA ex_data;
 
@@ -2291,8 +2287,7 @@ void ssl_cert_set_cert_cb(CERT *c, int (*cb) (SSL *ssl, void *arg), void *arg);
 
 __owur int ssl_verify_cert_chain(SSL *s, STACK_OF(X509) *sk);
 __owur int ssl_build_cert_chain(SSL *s, SSL_CTX *ctx, int flags);
-__owur int ssl_cert_set_cert_store(CERT *c, X509_STORE *store, int chain,
-                                   int ref);
+__owur int ssl_cert_set_cert_store(CERT *c, X509_STORE *store, int chain, int ref);
 
 __owur int ssl_security(const SSL *s, int op, int bits, int nid, void *other);
 __owur int ssl_ctx_security(const SSL_CTX *ctx, int op, int bits, int nid, void *other);

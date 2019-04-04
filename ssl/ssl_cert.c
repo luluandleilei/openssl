@@ -31,9 +31,7 @@ static volatile int ssl_x509_store_ctx_idx = -1;
 
 DEFINE_RUN_ONCE_STATIC(ssl_x509_store_ctx_init)
 {
-    ssl_x509_store_ctx_idx = X509_STORE_CTX_get_ex_new_index(0,
-                                                             "SSL for verify callback",
-                                                             NULL, NULL, NULL);
+    ssl_x509_store_ctx_idx = X509_STORE_CTX_get_ex_new_index(0, "SSL for verify callback", NULL, NULL, NULL);
     return ssl_x509_store_ctx_idx >= 0;
 }
 
@@ -398,8 +396,7 @@ int ssl_verify_cert_chain(SSL *s, STACK_OF(X509) *sk)
 
     /* Set suite B flags if needed */
     X509_STORE_CTX_set_flags(ctx, tls1_suiteb(s));
-    if (!X509_STORE_CTX_set_ex_data
-        (ctx, SSL_get_ex_data_X509_STORE_CTX_idx(), s)) {
+    if (!X509_STORE_CTX_set_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx(), s)) {
         goto end;
     }
 
@@ -1023,6 +1020,7 @@ int ssl_cert_lookup_by_nid(int nid, size_t *pidx)
     return 0;
 }
 
+//Check that the public key OID matches the sig alg?
 const SSL_CERT_LOOKUP *ssl_cert_lookup_by_pkey(const EVP_PKEY *pk, size_t *pidx)
 {
     int nid = EVP_PKEY_id(pk);

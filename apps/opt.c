@@ -550,9 +550,7 @@ int opt_verify(int opt, X509_VERIFY_PARAM *vpm)
         X509_VERIFY_PARAM_set_flags(vpm, X509_V_FLAG_CRL_CHECK);
         break;
     case OPT_V_CRL_CHECK_ALL:
-        X509_VERIFY_PARAM_set_flags(vpm,
-                                    X509_V_FLAG_CRL_CHECK |
-                                    X509_V_FLAG_CRL_CHECK_ALL);
+        X509_VERIFY_PARAM_set_flags(vpm, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
         break;
     case OPT_V_POLICY_CHECK:
         X509_VERIFY_PARAM_set_flags(vpm, X509_V_FLAG_POLICY_CHECK);

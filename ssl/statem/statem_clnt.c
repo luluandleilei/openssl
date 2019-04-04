@@ -1847,17 +1847,11 @@ MSG_PROCESS_RETURN tls_process_server_certificate(SSL *s, PACKET *pkt)
             PACKET extensions;
 
             if (!PACKET_get_length_prefixed_2(pkt, &extensions)) {
-                SSLfatal(s, SSL_AD_DECODE_ERROR,
-                         SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                         SSL_R_BAD_LENGTH);
+                SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, SSL_R_BAD_LENGTH);
                 goto err;
             }
-            if (!tls_collect_extensions(s, &extensions,
-                                        SSL_EXT_TLS1_3_CERTIFICATE, &rawexts,
-                                        NULL, chainidx == 0)
-                || !tls_parse_all_extensions(s, SSL_EXT_TLS1_3_CERTIFICATE,
-                                             rawexts, x, chainidx,
-                                             PACKET_remaining(pkt) == 0)) {
+            if (!tls_collect_extensions(s, &extensions, SSL_EXT_TLS1_3_CERTIFICATE, &rawexts, NULL, chainidx == 0)
+                || !tls_parse_all_extensions(s, SSL_EXT_TLS1_3_CERTIFICATE, rawexts, x, chainidx, PACKET_remaining(pkt) == 0)) {
                 OPENSSL_free(rawexts);
                 /* SSLfatal already called */
                 goto err;
@@ -1866,9 +1860,7 @@ MSG_PROCESS_RETURN tls_process_server_certificate(SSL *s, PACKET *pkt)
         }
 
         if (!sk_X509_push(sk, x)) {
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR,
-                     SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                     ERR_R_MALLOC_FAILURE);
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, ERR_R_MALLOC_FAILURE);
             goto err;
         }
         x = NULL;
@@ -1890,15 +1882,12 @@ MSG_PROCESS_RETURN tls_process_server_certificate(SSL *s, PACKET *pkt)
      * set. The *documented* interface remains the same.
      */
     if (s->verify_mode != SSL_VERIFY_NONE && i <= 0) {
-        SSLfatal(s, ssl_x509err2alert(s->verify_result),
-                 SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                 SSL_R_CERTIFICATE_VERIFY_FAILED);
+        SSLfatal(s, ssl_x509err2alert(s->verify_result), SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, SSL_R_CERTIFICATE_VERIFY_FAILED);
         goto err;
     }
     ERR_clear_error();          /* but we keep s->verify_result */
     if (i > 1) {
-        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
-                 SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, i);
+        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, i);
         goto err;
     }
 

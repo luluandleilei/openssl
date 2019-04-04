@@ -459,8 +459,8 @@ int i2d_ECPrivateKey_bio(BIO *bp, const EC_KEY *eckey)
 }
 #endif
 
-int X509_pubkey_digest(const X509 *data, const EVP_MD *type,
-                       unsigned char *md, unsigned int *len)
+//Returns a digest of the DER representation of the public key in the specified X509 'data' object. 
+int X509_pubkey_digest(const X509 *data, const EVP_MD *type, unsigned char *md, unsigned int *len)
 {
     ASN1_BIT_STRING *key;
     key = X509_get0_pubkey_bitstr(data);
@@ -493,15 +493,13 @@ int X509_CRL_digest(const X509_CRL *data, const EVP_MD *type,
         memcpy(md, data->sha1_hash, sizeof(data->sha1_hash));
         return 1;
     }
-    return (ASN1_item_digest
-            (ASN1_ITEM_rptr(X509_CRL), type, (char *)data, md, len));
+    return (ASN1_item_digest(ASN1_ITEM_rptr(X509_CRL), type, (char *)data, md, len));
 }
 
 int X509_REQ_digest(const X509_REQ *data, const EVP_MD *type,
                     unsigned char *md, unsigned int *len)
 {
-    return (ASN1_item_digest
-            (ASN1_ITEM_rptr(X509_REQ), type, (char *)data, md, len));
+    return (ASN1_item_digest(ASN1_ITEM_rptr(X509_REQ), type, (char *)data, md, len));
 }
 
 int X509_NAME_digest(const X509_NAME *data, const EVP_MD *type,

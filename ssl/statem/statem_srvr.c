@@ -3641,14 +3641,10 @@ MSG_PROCESS_RETURN tls_process_client_certificate(SSL *s, PACKET *pkt)
             PACKET extensions;
 
             if (!PACKET_get_length_prefixed_2(&spkt, &extensions)) {
-                SSLfatal(s, SSL_AD_DECODE_ERROR,
-                         SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE,
-                         SSL_R_BAD_LENGTH);
+                SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE, SSL_R_BAD_LENGTH);
                 goto err;
             }
-            if (!tls_collect_extensions(s, &extensions,
-                                        SSL_EXT_TLS1_3_CERTIFICATE, &rawexts,
-                                        NULL, chainidx == 0)
+            if (!tls_collect_extensions(s, &extensions, SSL_EXT_TLS1_3_CERTIFICATE, &rawexts, NULL, chainidx == 0)
                 || !tls_parse_all_extensions(s, SSL_EXT_TLS1_3_CERTIFICATE,
                                              rawexts, x, chainidx,
                                              PACKET_remaining(&spkt) == 0)) {
@@ -3659,9 +3655,7 @@ MSG_PROCESS_RETURN tls_process_client_certificate(SSL *s, PACKET *pkt)
         }
 
         if (!sk_X509_push(sk, x)) {
-            SSLfatal(s, SSL_AD_INTERNAL_ERROR,
-                     SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE,
-                     ERR_R_MALLOC_FAILURE);
+            SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE, ERR_R_MALLOC_FAILURE);
             goto err;
         }
         x = NULL;
@@ -3670,17 +3664,13 @@ MSG_PROCESS_RETURN tls_process_client_certificate(SSL *s, PACKET *pkt)
     if (sk_X509_num(sk) <= 0) {
         /* TLS does not mind 0 certs returned */
         if (s->version == SSL3_VERSION) {
-            SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE,
-                     SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE,
-                     SSL_R_NO_CERTIFICATES_RETURNED);
+            SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE, SSL_R_NO_CERTIFICATES_RETURNED);
             goto err;
         }
         /* Fail for TLS only if we required a certificate */
         else if ((s->verify_mode & SSL_VERIFY_PEER) &&
                  (s->verify_mode & SSL_VERIFY_FAIL_IF_NO_PEER_CERT)) {
-            SSLfatal(s, SSL_AD_CERTIFICATE_REQUIRED,
-                     SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE,
-                     SSL_R_PEER_DID_NOT_RETURN_A_CERTIFICATE);
+            SSLfatal(s, SSL_AD_CERTIFICATE_REQUIRED, SSL_F_TLS_PROCESS_CLIENT_CERTIFICATE, SSL_R_PEER_DID_NOT_RETURN_A_CERTIFICATE);
             goto err;
         }
         /* No client certificate so digest cached records */

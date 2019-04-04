@@ -48,13 +48,10 @@ static int by_file_ctrl(X509_LOOKUP *ctx, int cmd, const char *argp,
         if (argl == X509_FILETYPE_DEFAULT) {
             file = ossl_safe_getenv(X509_get_default_cert_file_env());
             if (file)
-                ok = (X509_load_cert_crl_file(ctx, file,
-                                              X509_FILETYPE_PEM) != 0);
+                ok = (X509_load_cert_crl_file(ctx, file, X509_FILETYPE_PEM) != 0);
 
             else
-                ok = (X509_load_cert_crl_file
-                      (ctx, X509_get_default_cert_file(),
-                       X509_FILETYPE_PEM) != 0);
+                ok = (X509_load_cert_crl_file (ctx, X509_get_default_cert_file(), X509_FILETYPE_PEM) != 0);
 
             if (!ok) {
                 X509err(X509_F_BY_FILE_CTRL, X509_R_LOADING_DEFAULTS);
@@ -219,8 +216,7 @@ int X509_load_cert_crl_file(X509_LOOKUP *ctx, const char *file, int type)
         }
     }
     if (count == 0)
-        X509err(X509_F_X509_LOAD_CERT_CRL_FILE,
-                X509_R_NO_CERTIFICATE_OR_CRL_FOUND);
+        X509err(X509_F_X509_LOAD_CERT_CRL_FILE, X509_R_NO_CERTIFICATE_OR_CRL_FOUND);
  err:
     sk_X509_INFO_pop_free(inf, X509_INFO_free);
     return count;

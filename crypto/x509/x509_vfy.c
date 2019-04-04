@@ -274,8 +274,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
      * first we make sure the chain we are going to build is present and that
      * the first entry is in place
      */
-    if (((ctx->chain = sk_X509_new_null()) == NULL) ||
-        (!sk_X509_push(ctx->chain, ctx->cert))) {
+    if (((ctx->chain = sk_X509_new_null()) == NULL) || (!sk_X509_push(ctx->chain, ctx->cert))) {
         X509err(X509_F_X509_VERIFY_CERT, ERR_R_MALLOC_FAILURE);
         ctx->error = X509_V_ERR_OUT_OF_MEM;
         return -1;
@@ -284,8 +283,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     ctx->num_untrusted = 1;
 
     /* If the peer's public key is too weak, we can stop early. */
-    if (!check_key_level(ctx, ctx->cert) &&
-        !verify_cb_cert(ctx, ctx->cert, 0, X509_V_ERR_EE_KEY_TOO_SMALL))
+    if (!check_key_level(ctx, ctx->cert) && !verify_cb_cert(ctx, ctx->cert, 0, X509_V_ERR_EE_KEY_TOO_SMALL))
         return 0;
 
     if (DANETLS_ENABLED(dane))
@@ -1721,8 +1719,7 @@ static int internal_verify(X509_STORE_CTX *ctx)
             goto check_cert;
         }
         if (n <= 0)
-            return verify_cb_cert(ctx, xi, 0,
-                                  X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE);
+            return verify_cb_cert(ctx, xi, 0, X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE);
         n--;
         ctx->error_depth = n;
         xs = sk_X509_value(ctx->chain, n);
@@ -1743,12 +1740,10 @@ static int internal_verify(X509_STORE_CTX *ctx)
          */
         if (xs != xi || (ctx->param->flags & X509_V_FLAG_CHECK_SS_SIGNATURE)) {
             if ((pkey = X509_get0_pubkey(xi)) == NULL) {
-                if (!verify_cb_cert(ctx, xi, xi != xs ? n+1 : n,
-                        X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY))
+                if (!verify_cb_cert(ctx, xi, xi != xs ? n+1 : n, X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY))
                     return 0;
             } else if (X509_verify(xs, pkey) <= 0) {
-                if (!verify_cb_cert(ctx, xs, n,
-                                    X509_V_ERR_CERT_SIGNATURE_FAILURE))
+                if (!verify_cb_cert(ctx, xs, n, X509_V_ERR_CERT_SIGNATURE_FAILURE))
                     return 0;
             }
         }
@@ -1885,16 +1880,14 @@ int X509_get_pubkey_parameters(EVP_PKEY *pkey, STACK_OF(X509) *chain)
     for (i = 0; i < sk_X509_num(chain); i++) {
         ktmp = X509_get0_pubkey(sk_X509_value(chain, i));
         if (ktmp == NULL) {
-            X509err(X509_F_X509_GET_PUBKEY_PARAMETERS,
-                    X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY);
+            X509err(X509_F_X509_GET_PUBKEY_PARAMETERS, X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY);
             return 0;
         }
         if (!EVP_PKEY_missing_parameters(ktmp))
             break;
     }
     if (ktmp == NULL) {
-        X509err(X509_F_X509_GET_PUBKEY_PARAMETERS,
-                X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN);
+        X509err(X509_F_X509_GET_PUBKEY_PARAMETERS, X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN);
         return 0;
     }
 
@@ -2175,6 +2168,7 @@ int X509_STORE_CTX_purpose_inherit(X509_STORE_CTX *ctx, int def_purpose,
     return 1;
 }
 
+//Returns a newly initialised X509_STORE_CTX structure.
 X509_STORE_CTX *X509_STORE_CTX_new(void)
 {
     X509_STORE_CTX *ctx = OPENSSL_zalloc(sizeof(*ctx));
@@ -2186,6 +2180,8 @@ X509_STORE_CTX *X509_STORE_CTX_new(void)
     return ctx;
 }
 
+//Completely frees up ctx. After this call ctx is no longer valid. 
+//If ctx is NULL nothing is done.
 void X509_STORE_CTX_free(X509_STORE_CTX *ctx)
 {
     if (ctx == NULL)
@@ -2195,8 +2191,14 @@ void X509_STORE_CTX_free(X509_STORE_CTX *ctx)
     OPENSSL_free(ctx);
 }
 
-int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *store, X509 *x509,
-                        STACK_OF(X509) *chain)
+//Sets up 'ctx' for a subsequent verification operation. 
+//It must be called before each call to X509_verify_cert(), i.e. a ctx is only good for one call to X509_verify_cert(); 
+//	if you want to verify a second certificate with the same ctx then you must call X509_STORE_CTX_cleanup() 
+//	and then X509_STORE_CTX_init() again before the second call to X509_verify_cert(). 
+//The trusted certificate store is set to 'store', the end entity certificate to be verified is set to 'x509' and 
+//	a set of additional certificates (which will be untrusted but may be used to build the chain) in 'chain'. 
+//Any or all of the 'store', 'x509' and 'chain' parameters can be NULL.
+int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *store, X509 *x509, STACK_OF(X509) *chain)
 {
     int ret = 1;
 
@@ -2344,6 +2346,8 @@ void X509_STORE_CTX_set0_trusted_stack(X509_STORE_CTX *ctx, STACK_OF(X509) *sk)
     ctx->lookup_certs = lookup_certs_sk;
 }
 
+//Internally cleans up an X509_STORE_CTX structure. 
+//The context can then be reused with an new call to X509_STORE_CTX_init().
 void X509_STORE_CTX_cleanup(X509_STORE_CTX *ctx)
 {
     /*
@@ -3197,22 +3201,16 @@ static int build_chain(X509_STORE_CTX *ctx)
     default:
         num = sk_X509_num(ctx->chain);
         if (num > depth)
-            return verify_cb_cert(ctx, NULL, num-1,
-                                  X509_V_ERR_CERT_CHAIN_TOO_LONG);
-        if (DANETLS_ENABLED(dane) &&
-            (!DANETLS_HAS_PKIX(dane) || dane->pdpth >= 0))
+            return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_CERT_CHAIN_TOO_LONG);
+        if (DANETLS_ENABLED(dane) && (!DANETLS_HAS_PKIX(dane) || dane->pdpth >= 0))
             return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_DANE_NO_MATCH);
         if (ss && sk_X509_num(ctx->chain) == 1)
-            return verify_cb_cert(ctx, NULL, num-1,
-                                  X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT);
+            return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT);
         if (ss)
-            return verify_cb_cert(ctx, NULL, num-1,
-                                  X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN);
+            return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN);
         if (ctx->num_untrusted < num)
-            return verify_cb_cert(ctx, NULL, num-1,
-                                  X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT);
-        return verify_cb_cert(ctx, NULL, num-1,
-                              X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY);
+            return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT);
+        return verify_cb_cert(ctx, NULL, num-1, X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY);
     }
 }
 

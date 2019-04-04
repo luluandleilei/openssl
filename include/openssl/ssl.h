@@ -1298,7 +1298,7 @@ DECLARE_PEM_rw(SSL_SESSION, SSL_SESSION)
         SSL_ctrl(ssl,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
 # endif
 //Add the rest of the certificates needed to form the complete certificate chain 
-//Adds the certificate x509 to the extra chain certificates associated with ctx. 
+//Adds the certificate 'x509' to the extra chain certificates associated with 'ctx'. 
 //Several certificates can be added one after another.
 //The x509 certificate provided to SSL_CTX_add_extra_chain_cert() will be freed by the library when the SSL_CTX is destroyed. An application should not free the x509 object.
 //Only one set of extra chain certificates can be specified per SSL_CTX structure. Different chains for different certificates (for example if both RSA and DSA certificates are specified by the same server) or different SSL structures with the same parent SSL_CTX cannot be specified using this function.
