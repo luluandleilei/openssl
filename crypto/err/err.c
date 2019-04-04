@@ -435,6 +435,7 @@ void ERR_put_error(int lib, int func, int reason, const char *file, int line)
     err_clear_data(es, es->top);
 }
 
+//Empties the current thread's error queue.
 void ERR_clear_error(void)
 {
     int i;

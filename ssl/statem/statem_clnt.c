@@ -1024,9 +1024,7 @@ MSG_PROCESS_RETURN ossl_statem_client_process_message(SSL *s, PACKET *pkt)
     switch (st->hand_state) {
     default:
         /* Shouldn't happen */
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR,
-                 SSL_F_OSSL_STATEM_CLIENT_PROCESS_MESSAGE,
-                 ERR_R_INTERNAL_ERROR);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_OSSL_STATEM_CLIENT_PROCESS_MESSAGE, ERR_R_INTERNAL_ERROR);
         return MSG_PROCESS_ERROR;
 
     case TLS_ST_CR_SRVR_HELLO:
@@ -1815,8 +1813,7 @@ MSG_PROCESS_RETURN tls_process_server_certificate(SSL *s, PACKET *pkt)
     const SSL_CERT_LOOKUP *clu;
 
     if ((sk = sk_X509_new_null()) == NULL) {
-        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                 ERR_R_MALLOC_FAILURE);
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, ERR_R_MALLOC_FAILURE);
         goto err;
     }
 
@@ -1825,30 +1822,23 @@ MSG_PROCESS_RETURN tls_process_server_certificate(SSL *s, PACKET *pkt)
             || !PACKET_get_net_3(pkt, &cert_list_len)
             || PACKET_remaining(pkt) != cert_list_len
             || PACKET_remaining(pkt) == 0) {
-        SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                 SSL_R_LENGTH_MISMATCH);
+        SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, SSL_R_LENGTH_MISMATCH);
         goto err;
     }
     for (chainidx = 0; PACKET_remaining(pkt); chainidx++) {
-        if (!PACKET_get_net_3(pkt, &cert_len)
-            || !PACKET_get_bytes(pkt, &certbytes, cert_len)) {
-            SSLfatal(s, SSL_AD_DECODE_ERROR,
-                     SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                     SSL_R_CERT_LENGTH_MISMATCH);
+        if (!PACKET_get_net_3(pkt, &cert_len) || !PACKET_get_bytes(pkt, &certbytes, cert_len)) {
+            SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, SSL_R_CERT_LENGTH_MISMATCH);
             goto err;
         }
 
         certstart = certbytes;
         x = d2i_X509(NULL, (const unsigned char **)&certbytes, cert_len);
         if (x == NULL) {
-            SSLfatal(s, SSL_AD_BAD_CERTIFICATE,
-                     SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, ERR_R_ASN1_LIB);
+            SSLfatal(s, SSL_AD_BAD_CERTIFICATE, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, ERR_R_ASN1_LIB);
             goto err;
         }
         if (certbytes != (certstart + cert_len)) {
-            SSLfatal(s, SSL_AD_DECODE_ERROR,
-                     SSL_F_TLS_PROCESS_SERVER_CERTIFICATE,
-                     SSL_R_CERT_LENGTH_MISMATCH);
+            SSLfatal(s, SSL_AD_DECODE_ERROR, SSL_F_TLS_PROCESS_SERVER_CERTIFICATE, SSL_R_CERT_LENGTH_MISMATCH);
             goto err;
         }
 
