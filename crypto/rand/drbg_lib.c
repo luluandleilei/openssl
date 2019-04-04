@@ -1,7 +1,7 @@
 /*
  * Copyright 2011-2018 The OpenSSL Project Authors. All Rights Reserved.
  *
- * Licensed under the OpenSSL license (the "License").  You may not use
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
  * in the file LICENSE in the source distribution or at
  * https://www.openssl.org/source/license.html
@@ -67,7 +67,7 @@ static CRYPTO_THREAD_LOCAL private_drbg;
 
 
 /* NIST SP 800-90A DRBG recommends the use of a personalization string. */
-static const char ossl_pers_string[] = "OpenSSL NIST SP 800-90A DRBG";
+static const char ossl_pers_string[] = DRBG_DEFAULT_PERS_STRING;
 
 static CRYPTO_ONCE rand_drbg_init = CRYPTO_ONCE_STATIC_INIT;
 
@@ -158,8 +158,10 @@ int RAND_DRBG_set(RAND_DRBG *drbg, int type, unsigned int flags)
     }
 
     /* If set is called multiple times - clear the old one */
-    if (type != drbg->type && drbg->type != 0 && drbg->meth != NULL) {
+    if (drbg->type != 0 && (type != drbg->type || flags != drbg->flags)) {
         drbg->meth->uninstantiate(drbg);
+        rand_pool_free(drbg->adin_pool);
+        drbg->adin_pool = NULL;
     }
 
     drbg->state = DRBG_UNINITIALISED;
@@ -168,6 +170,7 @@ int RAND_DRBG_set(RAND_DRBG *drbg, int type, unsigned int flags)
 
     if (type == 0) {
         /* Uninitialized; that's okay. */
+        drbg->meth = NULL;
         return 1;
     } else if (is_ctr(type)) {
         ret = drbg_ctr_init(drbg);
@@ -177,12 +180,17 @@ int RAND_DRBG_set(RAND_DRBG *drbg, int type, unsigned int flags)
         else
             ret = drbg_hash_init(drbg);
     } else {
+        drbg->type = 0;
+        drbg->flags = 0;
+        drbg->meth = NULL;
         RANDerr(RAND_F_RAND_DRBG_SET, RAND_R_UNSUPPORTED_DRBG_TYPE);
         return 0;
     }
 
-    if (ret == 0)
+    if (ret == 0) {
+        drbg->state = DRBG_ERROR;
         RANDerr(RAND_F_RAND_DRBG_SET, RAND_R_ERROR_INITIALISING_DRBG);
+    }
     return ret;
 }
 
@@ -233,8 +241,8 @@ static RAND_DRBG *rand_drbg_new(int secure,
                                 unsigned int flags,
                                 RAND_DRBG *parent)
 {
-    RAND_DRBG *drbg = secure ?
-        OPENSSL_secure_zalloc(sizeof(*drbg)) : OPENSSL_zalloc(sizeof(*drbg));
+    RAND_DRBG *drbg = secure ? OPENSSL_secure_zalloc(sizeof(*drbg))
+                             : OPENSSL_zalloc(sizeof(*drbg));
 
     if (drbg == NULL) {
         RANDerr(RAND_F_RAND_DRBG_NEW, ERR_R_MALLOC_FAILURE);
@@ -246,8 +254,13 @@ static RAND_DRBG *rand_drbg_new(int secure,
     drbg->parent = parent;
 
     if (parent == NULL) {
+#ifdef FIPS_MODE
+        drbg->get_entropy = rand_crngt_get_entropy;
+        drbg->cleanup_entropy = rand_crngt_cleanup_entropy;
+#else
         drbg->get_entropy = rand_drbg_get_entropy;
         drbg->cleanup_entropy = rand_drbg_cleanup_entropy;
+#endif
 #ifndef RAND_DRBG_GET_RANDOM_NONCE
         drbg->get_nonce = rand_drbg_get_nonce;
         drbg->cleanup_nonce = rand_drbg_cleanup_nonce;
@@ -287,10 +300,7 @@ static RAND_DRBG *rand_drbg_new(int secure,
     return drbg;
 
  err:
-    if (drbg->secure)
-        OPENSSL_secure_free(drbg);
-    else
-        OPENSSL_free(drbg);
+    RAND_DRBG_free(drbg);
 
     return NULL;
 }
@@ -315,6 +325,7 @@ void RAND_DRBG_free(RAND_DRBG *drbg)
 
     if (drbg->meth != NULL)
         drbg->meth->uninstantiate(drbg);
+    rand_pool_free(drbg->adin_pool);
     CRYPTO_THREAD_lock_free(drbg->lock);
     CRYPTO_free_ex_data(CRYPTO_EX_INDEX_DRBG, drbg, &drbg->ex_data);
 
@@ -431,6 +442,7 @@ int RAND_DRBG_uninstantiate(RAND_DRBG *drbg)
 {
     int index = -1, type, flags;
     if (drbg->meth == NULL) {
+        drbg->state = DRBG_ERROR;
         RANDerr(RAND_F_RAND_DRBG_UNINSTANTIATE,
                 RAND_R_NO_DRBG_IMPLEMENTATION_SELECTED);
         return 0;
@@ -550,11 +562,11 @@ int rand_drbg_restart(RAND_DRBG *drbg,
     const unsigned char *adin = NULL;
     size_t adinlen = 0;
 
-    if (drbg->pool != NULL) {
+    if (drbg->seed_pool != NULL) {
         RANDerr(RAND_F_RAND_DRBG_RESTART, ERR_R_INTERNAL_ERROR);
         drbg->state = DRBG_ERROR;
-        rand_pool_free(drbg->pool);
-        drbg->pool = NULL;
+        rand_pool_free(drbg->seed_pool);
+        drbg->seed_pool = NULL;
         return 0;
     }
 
@@ -574,8 +586,8 @@ int rand_drbg_restart(RAND_DRBG *drbg,
             }
 
             /* will be picked up by the rand_drbg_get_entropy() callback */
-            drbg->pool = rand_pool_attach(buffer, len, entropy);
-            if (drbg->pool == NULL)
+            drbg->seed_pool = rand_pool_attach(buffer, len, entropy);
+            if (drbg->seed_pool == NULL)
                 return 0;
         } else {
             if (drbg->max_adinlen < len) {
@@ -621,8 +633,8 @@ int rand_drbg_restart(RAND_DRBG *drbg,
         }
     }
 
-    rand_pool_free(drbg->pool);
-    drbg->pool = NULL;
+    rand_pool_free(drbg->seed_pool);
+    drbg->seed_pool = NULL;
 
     return drbg->state == DRBG_READY;
 }
@@ -722,9 +734,18 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
     unsigned char *additional = NULL;
     size_t additional_len;
     size_t chunk;
-    size_t ret;
+    size_t ret = 0;
 
-    additional_len = rand_drbg_get_additional_data(&additional, drbg->max_adinlen);
+    if (drbg->adin_pool == NULL) {
+        if (drbg->type == 0)
+            goto err;
+        drbg->adin_pool = rand_pool_new(0, 0, drbg->max_adinlen);
+        if (drbg->adin_pool == NULL)
+            goto err;
+    }
+
+    additional_len = rand_drbg_get_additional_data(drbg->adin_pool,
+                                                   &additional);
 
     for ( ; outlen > 0; outlen -= chunk, out += chunk) {
         chunk = outlen;
@@ -736,9 +757,9 @@ int RAND_DRBG_bytes(RAND_DRBG *drbg, unsigned char *out, size_t outlen)
     }
     ret = 1;
 
-err:
-    if (additional_len != 0)
-        OPENSSL_secure_clear_free(additional, additional_len);
+ err:
+    if (additional != NULL)
+        rand_drbg_cleanup_additional_data(drbg->adin_pool, additional);
 
     return ret;
 }
@@ -1029,12 +1050,8 @@ static int drbg_bytes(unsigned char *out, int count)
  * Calculates the minimum length of a full entropy buffer
  * which is necessary to seed (i.e. instantiate) the DRBG
  * successfully.
- *
- * NOTE: There is a copy of this function in drbgtest.c.
- *       If you change anything here, you need to update
- *       the copy accordingly.
  */
-static size_t rand_drbg_seedlen(RAND_DRBG *drbg)
+size_t rand_drbg_seedlen(RAND_DRBG *drbg)
 {
     /*
      * If no os entropy source is available then RAND_seed(buffer, bufsize)

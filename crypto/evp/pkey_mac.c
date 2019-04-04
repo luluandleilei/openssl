@@ -1,7 +1,7 @@
 /*
  * Copyright 2018 The OpenSSL Project Authors. All Rights Reserved.
  *
- * Licensed under the OpenSSL license (the "License").  You may not use
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
  * in the file LICENSE in the source distribution or at
  * https://www.openssl.org/source/license.html
@@ -71,7 +71,7 @@ static int pkey_mac_init(EVP_PKEY_CTX *ctx)
 
 static void pkey_mac_cleanup(EVP_PKEY_CTX *ctx);
 
-static int pkey_mac_copy(EVP_PKEY_CTX *dst, EVP_PKEY_CTX *src)
+static int pkey_mac_copy(EVP_PKEY_CTX *dst, const EVP_PKEY_CTX *src)
 {
     MAC_PKEY_CTX *sctx, *dctx;
 
@@ -231,9 +231,9 @@ static int pkey_mac_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
                 int rv;
 
                 if ((rv = EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_ENGINE,
-                                       ctx->engine)) < 0
+                                       ctx->engine)) <= 0
                     || (rv = EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_CIPHER,
-                                          p2)) < 0
+                                          p2)) <= 0
                     || !(rv = EVP_MAC_init(hctx->ctx)))
                     return rv;
             }
@@ -275,7 +275,7 @@ static int pkey_mac_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
                 return 0;
             break;
         case MAC_TYPE_MAC:
-            if (!EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_KEY, p2, p1))
+            if (EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_KEY, p2, p1) <= 0)
                 return 0;
             break;
         default:
@@ -296,11 +296,11 @@ static int pkey_mac_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
                     (ASN1_OCTET_STRING *)ctx->pkey->pkey.ptr;
 
                 if ((rv = EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_ENGINE,
-                                       ctx->engine)) < 0
+                                       ctx->engine)) <= 0
                     || (rv = EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_MD,
-                                          hctx->raw_data.md)) < 0
+                                          hctx->raw_data.md)) <= 0
                     || (rv = EVP_MAC_ctrl(hctx->ctx, EVP_MAC_CTRL_SET_KEY,
-                                          key->data, key->length)) < 0)
+                                          key->data, key->length)) <= 0)
                     return rv;
             }
             break;
@@ -395,6 +395,39 @@ const EVP_PKEY_METHOD hmac_pkey_meth = {
 
 const EVP_PKEY_METHOD siphash_pkey_meth = {
     EVP_PKEY_SIPHASH,
+    EVP_PKEY_FLAG_SIGCTX_CUSTOM,
+    pkey_mac_init,
+    pkey_mac_copy,
+    pkey_mac_cleanup,
+
+    0, 0,
+
+    0,
+    pkey_mac_keygen,
+
+    0, 0,
+
+    0, 0,
+
+    0, 0,
+
+    pkey_mac_signctx_init,
+    pkey_mac_signctx,
+
+    0, 0,
+
+    0, 0,
+
+    0, 0,
+
+    0, 0,
+
+    pkey_mac_ctrl,
+    pkey_mac_ctrl_str
+};
+
+const EVP_PKEY_METHOD poly1305_pkey_meth = {
+    EVP_PKEY_POLY1305,
     EVP_PKEY_FLAG_SIGCTX_CUSTOM,
     pkey_mac_init,
     pkey_mac_copy,

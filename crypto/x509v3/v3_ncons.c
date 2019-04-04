@@ -1,7 +1,7 @@
 /*
  * Copyright 2003-2018 The OpenSSL Project Authors. All Rights Reserved.
  *
- * Licensed under the OpenSSL license (the "License").  You may not use
+ * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
  * in the file LICENSE in the source distribution or at
  * https://www.openssl.org/source/license.html
@@ -158,6 +158,8 @@ static int i2r_NAME_CONSTRAINTS(const X509V3_EXT_METHOD *method, void *a,
     NAME_CONSTRAINTS *ncons = a;
     do_i2r_name_constraints(method, ncons->permittedSubtrees,
                             bp, ind, "Permitted");
+    if (ncons->permittedSubtrees && ncons->excludedSubtrees)
+        BIO_puts(bp, "\n");
     do_i2r_name_constraints(method, ncons->excludedSubtrees,
                             bp, ind, "Excluded");
     return 1;
@@ -172,13 +174,14 @@ static int do_i2r_name_constraints(const X509V3_EXT_METHOD *method,
     if (sk_GENERAL_SUBTREE_num(trees) > 0)
         BIO_printf(bp, "%*s%s:\n", ind, "", name);
     for (i = 0; i < sk_GENERAL_SUBTREE_num(trees); i++) {
+        if (i > 0)
+            BIO_puts(bp, "\n");
         tree = sk_GENERAL_SUBTREE_value(trees, i);
         BIO_printf(bp, "%*s", ind + 2, "");
         if (tree->base->type == GEN_IPADD)
             print_nc_ipadd(bp, tree->base->d.ip);
         else
             GENERAL_NAME_print(bp, tree->base);
-        BIO_puts(bp, "\n");
     }
     return 1;
 }
